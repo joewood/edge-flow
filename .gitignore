@@ -6,7 +6,7 @@
 
 # production
 /build
-*.map
+/lib/example/*.map
 
 # misc
 .DS_Store
