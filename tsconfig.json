@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "outDir": "lib",
+        "jsx": "react",
+        "sourceRoot": "src",
+        "sourceMap": true,
+        "target": "es5",
+        "lib": [
+            "es2015",
+            "es2017",
+            "dom"
+        ]
+    },
+    "files": [
+        "src/drawing.tsx",
+        "src/example/app.tsx"
+    ]
+}
