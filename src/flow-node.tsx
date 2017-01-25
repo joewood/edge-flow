@@ -15,7 +15,7 @@ export interface INode {
     group?: boolean;
 }
 
-export interface ILink {
+export interface IEdge {
     linkTo: string;
     ratePerSecond?: number;
     name?: string;
@@ -27,19 +27,19 @@ export interface ILink {
 
 
 export interface INodeProps extends INode {
-    children?: Link[];
+    children?: Edge[];
 }
 
 export class Node extends React.Component<INodeProps, any> {
-    public getLinks(): ILinkProps[] {
+    public getLinks(): IEdgeProps[] {
         return React.Children.map(this.props.children, (c: any) => c.props);
     }
     public render() { return <div>Do Not Render</div>; }
 }
 
-export interface ILinkProps extends ILink {
+export interface IEdgeProps extends IEdge {
 }
 
-export class Link extends React.Component<ILinkProps, any> {
+export class Edge extends React.Component<IEdgeProps, any> {
     public render() { return <div>Do Not Render</div>; }
 }

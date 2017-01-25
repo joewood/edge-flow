@@ -170,7 +170,7 @@ export default class Particles {
             this.backgroundColor ? this.backgroundColor.b / 256 : 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this.drawProgram.use();
-        this.drawProgram.uniform('second', ((new Date().valueOf() % 2000) / 2000.0));
+        this.drawProgram.uniform('second', ((new Date().valueOf() % 3000) / 3000.0));
         this.drawProgram.uniform('worldsize', this.worldsize);
         this.drawProgram.uniform('size', this.size);
         this.drawProgram.uniform('edgeData', 0, true);

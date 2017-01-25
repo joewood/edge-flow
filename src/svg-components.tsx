@@ -1,6 +1,22 @@
 import React = require("react");
 // import {Group, Surface, Text, Shape, Transform, LinearGradient, ClippingRectangle } from "react-art";
-import { wrapText } from "./string-functions";
+
+/** Given a text string and a maxium width, create several lines each no longer than width */
+export function wrapText(text: string, maxWidth: number): string[] {
+    let index = 0, nextIndex = 0;
+    let ret = [] as string[];
+    if (!text) { return []; }
+    do {
+        if (text.length >= (index + maxWidth)) {
+            nextIndex = text.lastIndexOf(" ", (index + maxWidth));
+        }
+        if (((index + maxWidth) > text.length) || (nextIndex < 0) || (nextIndex <= index)) {
+            return ret.concat([text.substr(index).trim()]);
+        }
+        ret.push(text.substring(index, nextIndex).trim());
+        index = nextIndex;
+    } while (true);
+}
 
 
 /** An attempt to create a text wrapped component for React Art.

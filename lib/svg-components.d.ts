@@ -1,4 +1,6 @@
 /// <reference types="react" />
+/** Given a text string and a maxium width, create several lines each no longer than width */
+export declare function wrapText(text: string, maxWidth: number): string[];
 /** An attempt to create a text wrapped component for React Art.
  *  Text will written in the middle of the specified rectangle.
  */

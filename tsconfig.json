@@ -13,7 +13,7 @@
         ]
     },
     "files": [
-        "src/drawing.tsx",
+        "src/index.ts",
         "src/example/app.tsx"
     ]
 }
