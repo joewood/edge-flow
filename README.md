@@ -17,11 +17,11 @@ npm install edge-flow
 
 Package comes with types built in (it's written using TypeScript).
 
-Live demo at (joewood.github.io/edge-flow)[http://joewood.github.io/edge-flow]
+Live demo at [joewood.github.io/edge-flow](http://joewood.github.io/#edge-flow)
 
 ## Usage
 
-```typescript
+```jsx
 import { EdgeFlow, Node, Edge } from "edge-flow"
 
 :: ::
