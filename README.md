@@ -21,7 +21,7 @@ Live demo at (joewood.github.io/edge-flow)[http://joewood.github.io/edge-flow]
 
 ## Usage
 
-```javascript
+```typescript
 import { EdgeFlow, Node, Edge } from "edge-flow"
 
 :: ::
