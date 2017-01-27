@@ -15,20 +15,21 @@ import { Motion, spring as _Spring } from "react-motion";
 const spring = _Spring; //(v: number) => oldSpring(v, { damping: 10, stiffness: 80 });
 
 
-export interface IEvent {
+export interface NodeClickEventArgs {
     nodeId: string;
     graph: { x: number, y: number };
     screen: { x: number, y: number };
 }
 
 export interface IProps {
-    text?: string;
-    width: number;
-    height: number;
+    // text?: string;
     run?: boolean;
-    containerStyle?: React.CSSProperties;
-    onClickNode?: (args: IEvent) => void;
-    backgroundColor?: string;
+    style?: {
+        width: number;
+        height: number;
+        backgroundColor?: string;
+    }
+    onClickNode?: (args: NodeClickEventArgs) => void;
     selectedNodeId?: string;
     children?: Node[];
 }
@@ -47,58 +48,29 @@ const styles = {
 }
 
 /** For a ILink return the Path Line Element (<path d="M x y L x y"/>) */
-function svgLineFromLink(nodeDict: Dictionary<INode>, linkFrom: INode, link: IEdge, strokeColor: string,
-    scaleX: (x: number) => number, scaleY: (y: number) => number) {
-    if (!nodeDict[link.linkTo]) {
-        console.error("Cannot find node referenced '" + link.linkTo + "'")
-        return null;
-    }
-    const pathFn = function (p) {
-        return <path
-            key={linkFrom.id + "--" + link.linkTo}
-            d={`M${p.fromx} ${p.fromy} L${p.tox} ${p.toy}`}
-            stroke={strokeColor}
-            opacity={0.1}
-            fill="transparent"
-            strokeWidth={12}
-        />
-    }
-    const linkTo = nodeDict[link.linkTo];
-    return React.createElement(Motion, {
-        key: linkFrom.id + "-" + link.linkTo,
-        defaultStyle: { fromx: scaleX(linkFrom.x), fromy: scaleY(linkFrom.y), tox: scaleX(linkTo.x), toy: scaleY(linkTo.y) },
-        style: { fromx: spring(scaleX(linkFrom.x)), fromy: spring(scaleY(linkFrom.y)), tox: spring(scaleX(linkTo.x)), toy: spring(scaleY(linkTo.y)) }
-    }, pathFn);
-}
-
-function flowEdgeFromLink(nodeDict: Dictionary<INode>,
-    width: number, height: number,
-    linkFrom: INode, link: IEdge,
-    scaleX: (x: number) => number, scaleY: (y: number) => number
-): JSX.Element {
-    if (!nodeDict[link.linkTo]) return null;
-    const linkTo = nodeDict[link.linkTo];
-    return <Motion key={linkFrom.id + "--" + link.linkTo}
-        defaultStyle={{
-            fromX: scaleX(linkFrom.x) / width,
-            fromY: 1 - scaleY(linkFrom.y) / height,
-            toX: scaleX(linkTo.x) / width,
-            toY: 1 - scaleY(linkTo.y) / height
-        }}
-        style={{
-            fromX: spring(scaleX(linkFrom.x) / width),
-            fromY: spring(1 - scaleY(linkFrom.y) / height),
-            toX: spring(scaleX(linkTo.x) / width),
-            toY: spring(1 - scaleY(linkTo.y) / height)
-        }}>
-        {({fromX, fromY, toX, toY}) =>
-            <Step key={linkFrom.id + "--" + link.linkTo}
-                fromX={scaleX(linkFrom.x) / width} fromY={1 - scaleY(linkFrom.y) / height}
-                toX={scaleX(linkTo.x) / width} toY={1 - scaleY(linkTo.y) / height}
-                ratePerSecond={link.ratePerSecond}
-                {...link} />
-        }</Motion>
-}
+// function svgLineFromLink(nodeDict: Dictionary<INode>, linkFrom: INode, link: IEdge, strokeColor: string,
+//     scaleX: (x: number) => number, scaleY: (y: number) => number) {
+//     if (!nodeDict[link.linkTo]) {
+//         console.error("Cannot find node referenced '" + link.linkTo + "'")
+//         return null;
+//     }
+//     const pathFn = function (p) {
+//         return <path
+//             key={linkFrom.id + "--" + link.linkTo}
+//             d={`M${p.fromx} ${p.fromy} L${p.tox} ${p.toy}`}
+//             stroke={strokeColor}
+//             opacity={0.1}
+//             fill="transparent"
+//             strokeWidth={12}
+//         />
+//     }
+//     const linkTo = nodeDict[link.linkTo];
+//     return React.createElement(Motion, {
+//         key: linkFrom.id + "-" + link.linkTo,
+//         defaultStyle: { fromx: scaleX(linkFrom.x), fromy: scaleY(linkFrom.y), tox: scaleX(linkTo.x), toy: scaleY(linkTo.y) },
+//         style: { fromx: spring(scaleX(linkFrom.x)), fromy: spring(scaleY(linkFrom.y)), tox: spring(scaleX(linkTo.x)), toy: spring(scaleY(linkTo.y)) },
+//     }, pathFn);
+// }
 
 /** Helper function, return the props of a children element */
 function getChildrenProps<T>(children: React.ReactNode): T[] {
@@ -106,24 +78,32 @@ function getChildrenProps<T>(children: React.ReactNode): T[] {
 }
 
 export class EdgeFlow extends React.Component<IProps, IState> {
+    private rootDiv: HTMLDivElement = null;
+
     constructor(p: IProps) {
         super(p);
-        this.state = {};
+        this.state = { width: 100, height: 100 };
+    }
+
+    private onResize = () => {
+        if (this.rootDiv) this.setState({ width: this.rootDiv.clientWidth, height: this.rootDiv.clientHeight });
     }
 
     public render() {
         const nodes = getChildrenProps<INodeProps>(this.props.children) || [];
         const nodeDict = keyBy(nodes, n => n.id);
-        const { width, height, run, children, containerStyle, backgroundColor, onClickNode, selectedNodeId } = this.props;
+        const { /*width, height, */run, children, style, /*backgroundColor,*/ onClickNode, selectedNodeId } = this.props;
+        const { backgroundColor, width, height} = style;
+
         const strokeColor = Color(backgroundColor).lighten(10).toString();
         const diagramHeight = height;
         const diagramWidth = width;
-        const style = {
+        const composedStyle = {
             ...styles.container,
-            ...containerStyle,
-            width: diagramWidth,
-            height: diagramHeight,
-            backgroundColor: backgroundColor
+            ...style,
+            // width: diagramWidth,
+            // height: diagramHeight,
+            // backgroundColor: backgroundColor
         };
         if (nodes.length === 0) return <div />;
         const max = { x: maxBy(nodes, n => n.x).x, y: maxBy(nodes, n => n.y).y };
@@ -141,19 +121,37 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                 .map(l => ({ from: node, ...l } as EdgeAndNodeType))
         ], [] as EdgeAndNodeType[]);
 
+        const svgLineFn = style =>
+            <g>{
+                allLinks.map(link => <path key={link.from.id + "-" + link.linkTo}
+                    d={`M${style[link.from.id + "-" + link.linkTo + "-fromX"]} ${style[link.from.id + "-" + link.linkTo + "-fromY"]} L${style[link.from.id + "-" + link.linkTo + "-toX"]} ${style[link.from.id + "-" + link.linkTo + "-toY"]}`}
+                    stroke={strokeColor}
+                    opacity={0.1}
+                    fill="transparent"
+                    strokeWidth={12}
+                />)
+            }</g>;
+
         return (
-            <div key="root" style={style}>
+            <div key="root" style={composedStyle} >
                 <svg width={width} height={height} style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
                     onClick={() => onClickNode({ nodeId: null, graph: null, screen: null })}
                 >
-                    <g>{
-                        nodes.reduce((p, node) =>
-                            [...p,
-                            getChildrenProps<IEdgeProps>(node.children)
-                                .filter(link => !isNaN(link.ratePerSecond) && (link.ratePerSecond > 0))
-                                .map(link => svgLineFromLink(nodeDict, node, link, strokeColor, scaleX, scaleY))
-                            ], [])
-                    }</g>
+                    <Motion defaultStyle={allLinks.reduce((p, link) => ({
+                        [link.from.id + "-" + link.linkTo + "-fromX"]: scaleX(link.from.x),
+                        [link.from.id + "-" + link.linkTo + "-fromY"]: scaleY(link.from.y),
+                        [link.from.id + "-" + link.linkTo + "-toX"]: scaleX(nodeDict[link.linkTo].x),
+                        [link.from.id + "-" + link.linkTo + "-toY"]: scaleY(nodeDict[link.linkTo].y),
+                        ...p
+                    }), {})}
+                        style={allLinks.reduce((p, link) => ({
+                            [link.from.id + "-" + link.linkTo + "-fromX"]: spring(scaleX(link.from.x)),
+                            [link.from.id + "-" + link.linkTo + "-fromY"]: spring(scaleY(link.from.y)),
+                            [link.from.id + "-" + link.linkTo + "-toX"]: spring(scaleX(nodeDict[link.linkTo].x)),
+                            [link.from.id + "-" + link.linkTo + "-toY"]: spring(scaleY(nodeDict[link.linkTo].y)),
+                            ...p
+                        }), {})}>{svgLineFn}
+                    </Motion>
                     <g>{
                         nodes.map(node => node.label && <Motion key={node.id}
                             defaultStyle={{ x: scaleX(node.x), y: scaleX(node.y) }}
@@ -221,7 +219,8 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                             [link.from.id + "-" + link.linkTo + "-toX"]: spring(scaleX(nodeDict[link.linkTo].x) / width),
                             [link.from.id + "-" + link.linkTo + "-toY"]: spring(1 - scaleY(nodeDict[link.linkTo].y) / height),
                             ...p
-                        }), {})}>
+                        }), {})}
+                    >
                         {
                             (style) => <Flow key="particles"
                                 width={diagramWidth}

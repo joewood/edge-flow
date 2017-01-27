@@ -22,9 +22,13 @@ export default class Particles {
     private running = false;
     private igloo: Igloo;
     private drawProgram: Program;
+    private texture: WebGLTexture = null;
+    private raf: number = 0;
 
     public backgroundColor: { r: number, g: number, b: number } = null;
     private count: number;
+    private edgeTexData: Float32Array;
+
 
     /**
      * @param nparticles initial particle count
@@ -44,6 +48,7 @@ export default class Particles {
         const h = canvas.height;
         gl.disable(gl.DEPTH_TEST);
         this.worldsize = new Float32Array([w, h]);
+        this.edgeTexData = new Float32Array([0, 0]);
         /* Drawing parameters. */
         this.color = "blue";
 
@@ -56,8 +61,9 @@ export default class Particles {
 
     private textureFromFloats(gl: WebGLRenderingContext, width: number, height: number, float32Array: Float32Array): WebGLTexture {
         var oldActive = gl.getParameter(gl.ACTIVE_TEXTURE);
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
+        if (this.texture) gl.deleteTexture(this.texture);
+        this.texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
             width, height, 0,
             gl.RGBA, gl.FLOAT, float32Array);
@@ -67,9 +73,9 @@ export default class Particles {
         gl.bindTexture(gl.TEXTURE_2D, null);
 
         gl.activeTexture(gl.TEXTURE0); // working register 31, thanks.
-        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
         // gl.activeTexture(oldActive);
-        return texture;
+        return this.texture;
     }
 
     /** Set a new particle count.   */
@@ -98,11 +104,11 @@ export default class Particles {
                 }
                 this.drawProgram.use();
                 // update time
-                const timeBuffer = this.igloo.array(timeOffsetArray,gl.STATIC_DRAW);
+                const timeBuffer = this.igloo.array(timeOffsetArray, gl.STATIC_DRAW);
                 timeBuffer.update(timeOffsetArray, gl.STATIC_DRAW);
                 this.drawProgram.attrib('time', timeBuffer, 1);
                 // update edge Index
-                const edgeIndexBuffer = this.igloo.array(edgeIndexArray,gl.STATIC_DRAW);
+                const edgeIndexBuffer = this.igloo.array(edgeIndexArray, gl.STATIC_DRAW);
                 edgeIndexBuffer.update(edgeIndexArray, gl.STATIC_DRAW);
                 this.drawProgram.attrib('edgeIndex', edgeIndexBuffer, 1);
             }
@@ -120,34 +126,36 @@ export default class Particles {
             const edgeRows = 3;
             const edgeRowsPower = 2 ** Math.floor(Math.log2(edgeRows) + 1);
 
-            const edgeTexData = new Float32Array(edgeCountPower * 4 * edgeRowsPower);
+            if (this.edgeTexData.length != edgeCountPower * 4 * edgeRowsPower) {
+                this.edgeTexData = new Float32Array(edgeCountPower * 4 * edgeRowsPower);
+            }
             // console.log(`Texture ${edgeCountPower} ${edgeRowsPower}`)
             const nodeVariation = 0.005;
             let edgeIndex = 0;
             for (let flow of flows) {
                 // set-up vertices in edgedata
-                edgeTexData[edgeIndex * 4 + vertexRow * edgeCountPower * 4] = flow.fromX;
-                edgeTexData[edgeIndex * 4 + 1 + vertexRow * edgeCountPower * 4] = flow.fromY;
-                edgeTexData[edgeIndex * 4 + 2 + vertexRow * edgeCountPower * 4] = flow.toX;
-                edgeTexData[edgeIndex * 4 + 3 + vertexRow * edgeCountPower * 4] = flow.toY;
+                this.edgeTexData[edgeIndex * 4 + vertexRow * edgeCountPower * 4] = flow.fromX;
+                this.edgeTexData[edgeIndex * 4 + 1 + vertexRow * edgeCountPower * 4] = flow.fromY;
+                this.edgeTexData[edgeIndex * 4 + 2 + vertexRow * edgeCountPower * 4] = flow.toX;
+                this.edgeTexData[edgeIndex * 4 + 3 + vertexRow * edgeCountPower * 4] = flow.toY;
 
-                edgeTexData[edgeIndex * 4 + variationRow * edgeCountPower * 4] = flow.variationMin || -0.01;
-                edgeTexData[edgeIndex * 4 + 1 + variationRow * edgeCountPower * 4] = flow.variationMax || 0.01;
-                edgeTexData[edgeIndex * 4 + 2 + variationRow * edgeCountPower * 4] = (flow.variationMax || 0.01) - (flow.variationMin || -0.01);
-                edgeTexData[edgeIndex * 4 + 3 + variationRow * edgeCountPower * 4] = Math.random(); 
+                this.edgeTexData[edgeIndex * 4 + variationRow * edgeCountPower * 4] = flow.variationMin || -0.01;
+                this.edgeTexData[edgeIndex * 4 + 1 + variationRow * edgeCountPower * 4] = flow.variationMax || 0.01;
+                this.edgeTexData[edgeIndex * 4 + 2 + variationRow * edgeCountPower * 4] = (flow.variationMax || 0.01) - (flow.variationMin || -0.01);
+                this.edgeTexData[edgeIndex * 4 + 3 + variationRow * edgeCountPower * 4] = Math.random();
                 // set-up color in edge Data
                 const edgeColor = Color(flow.color || this.color).array();
                 // console.log("Color: " + flow.color,edgeColor);
-                edgeTexData[edgeIndex * 4 + colorRow * edgeCountPower * 4] = edgeColor[0]/256;
-                edgeTexData[edgeIndex * 4 + 1 + colorRow * edgeCountPower * 4] = edgeColor[1]/256;
-                edgeTexData[edgeIndex * 4 + 2 + colorRow * edgeCountPower * 4] = edgeColor[2]/256;
-                edgeTexData[edgeIndex * 4 + 3 + colorRow * edgeCountPower * 4] = 1.0;
+                this.edgeTexData[edgeIndex * 4 + colorRow * edgeCountPower * 4] = edgeColor[0] / 256;
+                this.edgeTexData[edgeIndex * 4 + 1 + colorRow * edgeCountPower * 4] = edgeColor[1] / 256;
+                this.edgeTexData[edgeIndex * 4 + 2 + colorRow * edgeCountPower * 4] = edgeColor[2] / 256;
+                this.edgeTexData[edgeIndex * 4 + 3 + colorRow * edgeCountPower * 4] = 1.0;
                 edgeIndex++;
             }
             this.drawProgram.use();
 
             this.drawProgram.uniform('edgeCount', edgeCountPower);
-            const edgeTexture = this.textureFromFloats(this.igloo.gl, edgeCountPower, edgeRowsPower, edgeTexData);
+            const edgeTexture = this.textureFromFloats(this.igloo.gl, edgeCountPower, edgeRowsPower, this.edgeTexData);
 
             this.drawProgram.uniform('edgeData', 0, true);
         }
@@ -170,22 +178,23 @@ export default class Particles {
             this.backgroundColor ? this.backgroundColor.b / 256 : 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         this.drawProgram.use();
-        this.drawProgram.uniform('second', ((new Date().valueOf() % 3000) / 3000.0));
+        this.drawProgram.uniform('second', ((new Date().valueOf() % 2000) / 2000.0));
         this.drawProgram.uniform('worldsize', this.worldsize);
         this.drawProgram.uniform('size', this.size);
         this.drawProgram.uniform('edgeData', 0, true);
 
         const background = Color(this.color).array();
-        this.drawProgram.uniform('color', [background[0] / 255, background[1] / 255, background[2] / 255, 1.0]);// Color(this.color).array();
+        this.drawProgram.uniform('color', [background[0] / 255, background[1] / 255, background[2] / 255, 1.0]);
         this.drawProgram.draw(gl.POINTS, this.count);
         return this;
     };
 
     /** Register with requestAnimationFrame to step and draw a frame.*/
     public frame() {
-        window.requestAnimationFrame(() => {
+        this.raf = window.requestAnimationFrame(() => {
             if (this.running) {
-                this.draw().frame();
+                this.draw();
+                this.frame();
             } else {
                 console.log("Stopped");
             }
@@ -203,5 +212,6 @@ export default class Particles {
     /** Immediately stop the animation. */
     public stop() {
         this.running = false;
+        if (this.raf) window.cancelAnimationFrame(this.raf);
     }
 }

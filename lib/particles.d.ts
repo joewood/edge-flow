@@ -16,12 +16,15 @@ export default class Particles {
     private running;
     private igloo;
     private drawProgram;
+    private texture;
+    private raf;
     backgroundColor: {
         r: number;
         g: number;
         b: number;
     };
     private count;
+    private edgeTexData;
     /**
      * @param nparticles initial particle count
      * @param [size=5] particle size in pixels

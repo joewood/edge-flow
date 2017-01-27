@@ -6,6 +6,7 @@ import { EdgeFlow, Node, Edge } from ".."
 interface IState {
     animationIndex: number;
     points: { x: number, y: number }[];
+    animate?: boolean;
 }
 
 const radius = 200;
@@ -28,7 +29,9 @@ class App extends React.Component<any, IState> {
     constructor(p: any) {
         super(p);
         this.state = {
-            animationIndex: 0, points: range(0, 24).map((pt, i, arr) => circlePoint(i, arr.length)),
+            animationIndex: 0,
+            points: range(0, 24).map((pt, i, arr) => circlePoint(i, arr.length)),
+            animate: true
         };
     }
 
@@ -39,7 +42,7 @@ class App extends React.Component<any, IState> {
     }
 
     private componentDidMount() {
-        this.timer = window.setInterval(this.moveNext, 4000)
+        this.timer = window.setInterval(this.moveNext, 2000)
     }
 
     private componentWillUnmount() {
@@ -51,12 +54,13 @@ class App extends React.Component<any, IState> {
         const { points} = this.state;
         const numPoints = points.length;
         return <div id="root" style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black" }}>
-            <EdgeFlow backgroundColor="#0f0f0f" height={600} width={600} run={true} >
+            <p style={{ color: "white" }} onClick={() => this.setState({ animate: !this.state.animate })}>Click to Pause</p>
+            <EdgeFlow style={{ height: 600, width: 600, backgroundColor: "#0f0f0f" }} run={this.state.animate} >
                 {
                     [...points.map((p, i) =>
                         <Node key={"node" + i} id={"node" + i} label={i.toString()} x={p.x} y={p.y} labelColor="white" >
                             <Edge linkTo={"node" + (i + 1) % numPoints} ratePerSecond={10} variationMin={-0.03} variationMax={0.03} color={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`} />
-                            <Edge linkTo={"nodep-" + Math.floor(i / points.length * 4)} ratePerSecond={15+i*2} color="#e0ffe0" />
+                            <Edge linkTo={"nodep-" + Math.floor(i / points.length * 4)} ratePerSecond={15 + i * 2} color="#e0ffe0" />
                         </Node>),
                     <Node key="nodep-0" id="nodep-0" x={radius + radius / 3} y={radius + radius / 3} />,
                     <Node key="nodep-1" id="nodep-1" x={radius - radius / 3} y={radius + radius / 3} />,

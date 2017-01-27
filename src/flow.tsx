@@ -34,10 +34,9 @@ export class Flow extends React.PureComponent<IProps, any> {
         if (!this.canvas) return;
         if (!this.particles) this.particles = new Particles(this.canvas, 2);
         const background = Color(props.backgroundColor);
-        // console.log("children: ", React.Children.map(props.children, (f => f.valueOf() as any)).slice(0,1)[0]);
-        this.particles.stop();
-        const flowsAny = React.Children.map(props.children, c => (c as any).props.style ? (c as any).valueOf() : c ) || [];
-        const flows = flowsAny.map( fa => fa.props as IFlow);
+        // this.particles.stop();
+        const flowsAny = React.Children.map(props.children, c => (c as any).props.style ? (c as any).valueOf() : c) || [];
+        const flows = flowsAny.map(fa => fa.props as IFlow);
         this.particles.backgroundColor = { r: background.red(), g: background.green(), b: background.blue() };
         this.particles.updateBuffers(flows);
         this.particles.draw();
@@ -50,7 +49,10 @@ export class Flow extends React.PureComponent<IProps, any> {
                 this.setupParticles(newProps);
             }
             if (newProps.run !== this.props.run) {
-                if (newProps.run) this.particles.start(); else this.particles.stop();
+                if (newProps.run)
+                    this.particles.start();
+                else
+                    this.particles.stop();
             }
         }
     }
@@ -74,15 +76,18 @@ export class Flow extends React.PureComponent<IProps, any> {
         const { width, height} = this.props;
         const running = this.particles && this.particles.isRunning;
         return (
-            <canvas key="canva" style={{ pointerEvents: "none" }} ref={canvas => {
-                if (this.canvas === canvas || !canvas) return;
-                this.canvas = canvas;
-                if (this.particles) {
-                    this.particles.stop();
-                    this.particles = null;
-                }
-                this.setupParticles(this.props);
-            } } width={width} height={height}>
+            <canvas key="canva"
+                style={{ pointerEvents: "none" }}
+                ref={canvas => {
+                    if (this.canvas === canvas || !canvas) return;
+                    this.canvas = canvas;
+                    console.log("New Canvas");
+                    if (this.particles) {
+                        this.particles.stop();
+                        this.particles = null;
+                    }
+                    this.setupParticles(this.props);
+                }} width={width} height={height}>
             </canvas>);
     }
 }
