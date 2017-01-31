@@ -38,14 +38,14 @@ export class Flow extends React.PureComponent<IProps, any> {
         const flowsAny = React.Children.map(props.children, c => (c as any).props.style ? (c as any).valueOf() : c) || [];
         const flows = flowsAny.map(fa => fa.props as IFlow);
         this.particles.backgroundColor = { r: background.red(), g: background.green(), b: background.blue() };
-        this.particles.updateBuffers(flows);
+        this.particles.updateBuffers(flows, props.width, props.height);
         this.particles.draw();
         if (props.run) this.particles.start();
     }
 
     private componentWillReceiveProps(newProps: IProps) {
         if (!!this.particles) {
-            if (this.props.children !== newProps.children || this.props.width!=newProps.width || this.props.height!=newProps.height) {
+            if (this.props.children !== newProps.children || this.props.width != newProps.width || this.props.height != newProps.height) {
                 this.setupParticles(newProps);
             }
             if (newProps.run !== this.props.run) {

@@ -79,7 +79,7 @@ export default class Particles {
     }
 
     /** Set a new particle count.   */
-    public updateBuffers(flows: IFlow[]) {
+    public updateBuffers(flows: IFlow[],width:number,height:number) {
         try {
             const gl = this.igloo.gl;
             const pointCount = flows.reduce((p, c) => c.ratePerSecond + p, 0);
@@ -111,7 +111,7 @@ export default class Particles {
                 this.drawProgram.attrib('edgeIndex', edgeIndexBuffer, 1);
             }
 
-            this.worldsize = new Float32Array([this.canvas.width, this.canvas.height]);
+            this.worldsize = new Float32Array([width, height]);
             const w = this.worldsize[0];
             const h = this.worldsize[1];
             const edgeCountPower = 2 ** Math.floor(Math.log2(edgeCount) + 1);

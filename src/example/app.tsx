@@ -73,7 +73,7 @@ class App extends React.Component<any, IState> {
             <p style={{ color: "white", height: 20 }} onClick={() => this.setState({ animate: !this.state.animate })}>Click to Pause</p>
             <EdgeFlow style={{ height: height*0.8 - 20, width: width*0.8, backgroundColor: "#0f0f0f" }} run={this.state.animate} >
                 {
-                    [...points.map((p, i) =>
+                       [...points.map((p, i) =>
                         <Node key={"node" + i} id={"node" + i} label={i.toString()} x={p.x} y={p.y} labelColor="white" >
                             <Edge linkTo={"node" + (i + 1) % numPoints} ratePerSecond={10} variationMin={-0.03} variationMax={0.03} color={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`} />
                             <Edge linkTo={"nodep-" + Math.floor(i / points.length * 4)} ratePerSecond={15 + i * 2} color="#e0ffe0" />

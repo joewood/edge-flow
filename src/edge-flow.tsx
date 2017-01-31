@@ -47,31 +47,6 @@ const styles = {
     } as React.CSSProperties
 }
 
-/** For a ILink return the Path Line Element (<path d="M x y L x y"/>) */
-// function svgLineFromLink(nodeDict: Dictionary<INode>, linkFrom: INode, link: IEdge, strokeColor: string,
-//     scaleX: (x: number) => number, scaleY: (y: number) => number) {
-//     if (!nodeDict[link.linkTo]) {
-//         console.error("Cannot find node referenced '" + link.linkTo + "'")
-//         return null;
-//     }
-//     const pathFn = function (p) {
-//         return <path
-//             key={linkFrom.id + "--" + link.linkTo}
-//             d={`M${p.fromx} ${p.fromy} L${p.tox} ${p.toy}`}
-//             stroke={strokeColor}
-//             opacity={0.1}
-//             fill="transparent"
-//             strokeWidth={12}
-//         />
-//     }
-//     const linkTo = nodeDict[link.linkTo];
-//     return React.createElement(Motion, {
-//         key: linkFrom.id + "-" + link.linkTo,
-//         defaultStyle: { fromx: scaleX(linkFrom.x), fromy: scaleY(linkFrom.y), tox: scaleX(linkTo.x), toy: scaleY(linkTo.y) },
-//         style: { fromx: spring(scaleX(linkFrom.x)), fromy: spring(scaleY(linkFrom.y)), tox: spring(scaleX(linkTo.x)), toy: spring(scaleY(linkTo.y)) },
-//     }, pathFn);
-// }
-
 /** Helper function, return the props of a children element */
 function getChildrenProps<T>(children: React.ReactNode): T[] {
     return React.Children.map<T>(children, child => (child as any).props) || [];
@@ -100,10 +75,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
         const diagramWidth = width;
         const composedStyle = {
             ...styles.container,
-            ...style,
-            // width: diagramWidth,
-            // height: diagramHeight,
-            // backgroundColor: backgroundColor
+            ...style
         };
         if (nodes.length === 0) return <div />;
         const max = { x: maxBy(nodes, n => n.x).x, y: maxBy(nodes, n => n.y).y };
