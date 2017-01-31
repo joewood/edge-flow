@@ -10,6 +10,7 @@ export interface IFlow {
     variationMax?: number;
 }
 export default class Particles {
+    private canvas;
     private size;
     private worldsize;
     private color;
@@ -33,7 +34,7 @@ export default class Particles {
     readonly isRunning: boolean;
     private textureFromFloats(gl, width, height, float32Array);
     /** Set a new particle count.   */
-    updateBuffers(flows: IFlow[]): void;
+    updateBuffers(flows: IFlow[], width: number, height: number): void;
     /** Draw the current simulation state to the display. */
     draw(): this;
     /** Register with requestAnimationFrame to step and draw a frame.*/
