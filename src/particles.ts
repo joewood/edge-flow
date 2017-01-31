@@ -34,7 +34,7 @@ export default class Particles {
      * @param nparticles initial particle count
      * @param [size=5] particle size in pixels
      */
-    constructor(canvas: HTMLCanvasElement, private size: number = 5) {
+    constructor(private canvas: HTMLCanvasElement, private size: number = 5) {
         const igloo = this.igloo = new Igloo(canvas);
         const vertexShaderText = vertexShader(0);
         const pixelShaderText = pixelShader(0);
@@ -84,8 +84,6 @@ export default class Particles {
             const gl = this.igloo.gl;
             const pointCount = flows.reduce((p, c) => c.ratePerSecond + p, 0);
             const edgeCount = flows.length;
-            // seed random for consistency
-            // const random = seedRandom("FlowNetwork");
 
             if (pointCount != this.count) {
                 console.log("Updating Time: " + pointCount);
@@ -113,6 +111,7 @@ export default class Particles {
                 this.drawProgram.attrib('edgeIndex', edgeIndexBuffer, 1);
             }
 
+            this.worldsize = new Float32Array([this.canvas.width, this.canvas.height]);
             const w = this.worldsize[0];
             const h = this.worldsize[1];
             const edgeCountPower = 2 ** Math.floor(Math.log2(edgeCount) + 1);
