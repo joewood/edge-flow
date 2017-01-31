@@ -45,7 +45,7 @@ export class Flow extends React.PureComponent<IProps, any> {
 
     private componentWillReceiveProps(newProps: IProps) {
         if (!!this.particles) {
-            if (this.props.children !== newProps.children) {
+            if (this.props.children !== newProps.children || this.props.width!=newProps.width || this.props.height!=newProps.height) {
                 this.setupParticles(newProps);
             }
             if (newProps.run !== this.props.run) {
