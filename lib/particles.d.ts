@@ -6,6 +6,7 @@ export interface IFlow {
     ratePerSecond: number;
     color?: string;
     size?: number;
+    shape?: number;
     variationMin?: number;
     variationMax?: number;
 }

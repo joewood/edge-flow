@@ -20,6 +20,7 @@ export interface IEdge {
     ratePerSecond?: number;
     name?: string;
     color?: string;
+    shape?:number;
     size?: number;
     variationMin?: number;
     variationMax?: number;

@@ -4,15 +4,7 @@ import Particles from "./particles";
 import Color = require("color");
 import { IFlow } from './particles'
 
-export interface IStepProps {
-    ratePerSecond: number;
-    fromX: number;
-    fromY: number;
-    toX: number;
-    toY: number;
-}
-
-export class Step extends React.Component<IStepProps, any> {
+export class Step extends React.Component<IFlow, any> {
     public render() {
         return null;
     }

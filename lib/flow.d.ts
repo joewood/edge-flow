@@ -1,13 +1,7 @@
 /// <reference types="react" />
 import * as React from "react";
-export interface IStepProps {
-    ratePerSecond: number;
-    fromX: number;
-    fromY: number;
-    toX: number;
-    toY: number;
-}
-export declare class Step extends React.Component<IStepProps, any> {
+import { IFlow } from './particles';
+export declare class Step extends React.Component<IFlow, any> {
     render(): any;
 }
 export interface IProps {

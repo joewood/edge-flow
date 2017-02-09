@@ -1,6 +1,7 @@
 import Igloo, { Program, Buffer, Texture } from "igloo-ts";
 const seedRandom = require("seedrandom");
-import { vertexShader, pixelShader } from "./shaders"
+const vertexShader = require ("./shaders/vertex.glsl");
+const pixelShader = require ("./shaders/pixel.glsl");
 import Color = require("color");
 
 export interface IFlow {
@@ -11,6 +12,7 @@ export interface IFlow {
     ratePerSecond: number;
     color?: string;
     size?: number;
+    shape?: number;
     variationMin?: number;
     variationMax?: number;
 }
@@ -29,15 +31,14 @@ export default class Particles {
     private count: number;
     private edgeTexData: Float32Array;
 
-
     /**
      * @param nparticles initial particle count
      * @param [size=5] particle size in pixels
      */
-    constructor(private canvas: HTMLCanvasElement, private size: number = 5) {
+    constructor(private canvas: HTMLCanvasElement, private size: number = 8) {
         const igloo = this.igloo = new Igloo(canvas);
-        const vertexShaderText = vertexShader(0);
-        const pixelShaderText = pixelShader(0);
+        const vertexShaderText = vertexShader;
+        const pixelShaderText = pixelShader;
 
         this.drawProgram = this.igloo.program(vertexShaderText, pixelShaderText);
         const gl = igloo.gl;
@@ -114,16 +115,17 @@ export default class Particles {
             this.worldsize = new Float32Array([width, height]);
             const w = this.worldsize[0];
             const h = this.worldsize[1];
-            const edgeCountPower = 2 ** Math.floor(Math.log2(edgeCount) + 1);
+            const edgeCountPower = 2 ** Math.ceil(Math.log2(edgeCount));
             // edge buffer
             // edge buffer usage:
             const colorRow = 0;
             const vertexRow = 1;
             const variationRow = 2;
+            const shapeRow = 3;
             // row #0 - colors
             // row #1 - fromx,fromy,tox,toy
-            const edgeRows = 3;
-            const edgeRowsPower = 2 ** Math.floor(Math.log2(edgeRows) + 1);
+            const edgeRows = 4;
+            const edgeRowsPower = 2 ** Math.ceil(Math.log2(edgeRows));
 
             if (this.edgeTexData.length != edgeCountPower * 4 * edgeRowsPower) {
                 this.edgeTexData = new Float32Array(edgeCountPower * 4 * edgeRowsPower);
@@ -144,11 +146,16 @@ export default class Particles {
                 this.edgeTexData[edgeIndex * 4 + 3 + variationRow * edgeCountPower * 4] = Math.random();
                 // set-up color in edge Data
                 const edgeColor = Color(flow.color || this.color).array();
-                // console.log("Color: " + flow.color,edgeColor);
                 this.edgeTexData[edgeIndex * 4 + colorRow * edgeCountPower * 4] = edgeColor[0] / 256;
                 this.edgeTexData[edgeIndex * 4 + 1 + colorRow * edgeCountPower * 4] = edgeColor[1] / 256;
                 this.edgeTexData[edgeIndex * 4 + 2 + colorRow * edgeCountPower * 4] = edgeColor[2] / 256;
                 this.edgeTexData[edgeIndex * 4 + 3 + colorRow * edgeCountPower * 4] = 1.0;
+                // set-up shape
+                this.edgeTexData[edgeIndex*4 + shapeRow * edgeCountPower*4] = (flow.size || this.size || 8.0) / 256;
+                this.edgeTexData[edgeIndex*4 + 1+shapeRow * edgeCountPower*4] = flow.shape || 1.0;
+                this.edgeTexData[edgeIndex*4 + 2+shapeRow * edgeCountPower*4] = 0;
+                this.edgeTexData[edgeIndex*4 + 3+shapeRow * edgeCountPower*4] = 0;
+                
                 edgeIndex++;
             }
             this.drawProgram.use();
@@ -179,7 +186,7 @@ export default class Particles {
         this.drawProgram.use();
         this.drawProgram.uniform('second', ((new Date().valueOf() % 2000) / 2000.0));
         this.drawProgram.uniform('worldsize', this.worldsize);
-        this.drawProgram.uniform('size', this.size);
+        // this.drawProgram.uniform('size', this.size);
         this.drawProgram.uniform('edgeData', 0, true);
 
         const background = Color(this.color).array();
