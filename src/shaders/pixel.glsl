@@ -13,6 +13,6 @@ void main() {
     // float a = smoothstep(1.0 - DELTA, 1.0, length(p));
     // float a2 = smoothstep(1.0 - 0.2, 1.0, length(p2));
     // vec4 bc = mix(particleColor*0.3,vec4(0.0),a2);
-    float roundness = mix(max(abs(p.x),abs(p.y)),length(p),shape);
-    gl_FragColor =   mix(particleColor, vec4(0.0), roundness);
+    float roundness = mix(0.0,length(p),shape);
+    gl_FragColor = mix(particleColor, vec4(0.0), roundness);
 }

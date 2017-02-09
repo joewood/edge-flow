@@ -152,7 +152,7 @@ export default class Particles {
                 this.edgeTexData[edgeIndex * 4 + 3 + colorRow * edgeCountPower * 4] = 1.0;
                 // set-up shape
                 this.edgeTexData[edgeIndex*4 + shapeRow * edgeCountPower*4] = (flow.size || this.size || 8.0) / 256;
-                this.edgeTexData[edgeIndex*4 + 1+shapeRow * edgeCountPower*4] = flow.shape || 1.0;
+                this.edgeTexData[edgeIndex*4 + 1+shapeRow * edgeCountPower*4] = flow.shape || 0.0;
                 this.edgeTexData[edgeIndex*4 + 2+shapeRow * edgeCountPower*4] = 0;
                 this.edgeTexData[edgeIndex*4 + 3+shapeRow * edgeCountPower*4] = 0;
                 
