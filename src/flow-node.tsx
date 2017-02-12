@@ -27,6 +27,7 @@ export interface IEdge {
     pathOpacity?:number;
     variationMin?: number;
     variationMax?: number;
+    endingColor?:string;
 }
 
 

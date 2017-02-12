@@ -17,7 +17,8 @@ const colorRow = 0;
 const vertexRow = 1;
 const variationRow = 2;
 const shapeRow = 3;
-const edgeRows = 4;
+const endColorRow = 4;
+const edgeRows = 5;
 
 export default class Particles {
     private worldsize: Float32Array;
@@ -98,6 +99,7 @@ export default class Particles {
 
             if (this.textureData.length != edgeCount) {
                 this.textureData = new TextureData(edgeRows, edgeCount);
+                console.log(`Allocated Texture ${this.textureData.lengthPower2} x ${this.textureData.rowsPower2}`)
             }
             const nodeVariation = 0.005;
             let edgeIndex = 0;
@@ -109,6 +111,7 @@ export default class Particles {
                 this.textureData.setValue(variationRow, edgeIndex, edge.variationMin || -0.01, edge.variationMax || 0.01, (edge.variationMax || 0.01) - (edge.variationMin || -0.01), Math.random());
                 // set-up color in edge Data
                 this.textureData.setColor(colorRow, edgeIndex, edge.color || this.color);
+                this.textureData.setColor(endColorRow, edgeIndex, edge.endingColor || edge.color || this.color);
                 // set-up shape
                 this.textureData.setValue(shapeRow, edgeIndex, (edge.size || this.size || 8.0) / 256, edge.shape || 0.0, 0.0, 0.0);
 
@@ -117,6 +120,12 @@ export default class Particles {
             this.program.use();
 
             this.program.uniform('edgeCount', this.textureData.lengthPower2);
+            this.program.uniform('variationRow', (variationRow + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('colorRow', (colorRow + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('vertexRow', (vertexRow + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('endColorRow', (endColorRow + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('shapeRow', (shapeRow + 0.5) / this.textureData.rowsPower2);
+
             const edgeTexture = this.textureData.bindTexture(this.igloo.gl, gl.TEXTURE0);
 
             this.program.uniform('edgeData', 0, true);

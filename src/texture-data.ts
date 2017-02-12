@@ -27,8 +27,9 @@ export default class TextureData {
     }
 
     public setColor(row: number, index: number, color: string, alpha = 1.0): void {
-        const colorarray = Color(color).array();
-        this.setValue(row, index, colorarray[0] / 256, colorarray[1] / 256, colorarray[2] / 256, alpha);
+        const colorObj = Color(color);
+        const colorarray = colorObj.array();
+        this.setValue(row, index, colorarray[0] / 256, colorarray[1] / 256, colorarray[2] / 256, colorObj.alpha());
     }
 
     public getData() : Float32Array {

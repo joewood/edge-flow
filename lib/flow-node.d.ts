@@ -25,6 +25,7 @@ export interface IEdge {
     pathOpacity?: number;
     variationMin?: number;
     variationMax?: number;
+    endingColor?: string;
 }
 export interface INodeProps extends INode {
     children?: Edge[];
