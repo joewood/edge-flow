@@ -1,14 +1,9 @@
-export interface IFlow {
+import { IEdge as IModelEdge } from "./flow-node";
+export interface IFlow extends IModelEdge {
     fromX: number;
     fromY: number;
     toX: number;
     toY: number;
-    ratePerSecond: number;
-    color?: string;
-    size?: number;
-    shape?: number;
-    variationMin?: number;
-    variationMax?: number;
 }
 export default class Particles {
     private canvas;
@@ -17,8 +12,7 @@ export default class Particles {
     private color;
     private running;
     private igloo;
-    private drawProgram;
-    private texture;
+    private program;
     private raf;
     backgroundColor: {
         r: number;
@@ -26,16 +20,15 @@ export default class Particles {
         b: number;
     };
     private count;
-    private edgeTexData;
+    private textureData;
     /**
      * @param nparticles initial particle count
      * @param [size=5] particle size in pixels
      */
     constructor(canvas: HTMLCanvasElement, size?: number);
     readonly isRunning: boolean;
-    private textureFromFloats(gl, width, height, float32Array);
-    /** Set a new particle count.   */
-    updateBuffers(flows: IFlow[], width: number, height: number): void;
+    /** If the vertices have changed then update the buffers   */
+    updateBuffers(edges: IFlow[], width: number, height: number): void;
     /** Draw the current simulation state to the display. */
     draw(): this;
     /** Register with requestAnimationFrame to step and draw a frame.*/
