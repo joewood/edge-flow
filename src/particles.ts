@@ -1,25 +1,18 @@
 import Igloo, { Program, Buffer, Texture } from "igloo-ts";
-const seedRandom = require("seedrandom");
 const vertexShader = require("./shaders/vertex.glsl");
 const pixelShader = require("./shaders/pixel.glsl");
 import Color = require("color");
 import TextureData from "./texture-data";
+import { IEdge as IModelEdge } from "./flow-node"
 
-
-export interface IFlow {
+export interface IFlow extends IModelEdge {
     fromX: number;
     fromY: number;
     toX: number;
     toY: number;
-    ratePerSecond: number;
-    color?: string;
-    size?: number;
-    shape?: number;
-    variationMin?: number;
-    variationMax?: number;
 }
 
-
+// texture buffer used to hold vertex information
 const colorRow = 0;
 const vertexRow = 1;
 const variationRow = 2;
@@ -32,7 +25,6 @@ export default class Particles {
     private running = false;
     private igloo: Igloo;
     private program: Program;
-    private texture: WebGLTexture = null;
     private raf: number = 0;
 
     public backgroundColor: { r: number, g: number, b: number } = null;
@@ -103,7 +95,6 @@ export default class Particles {
                 edgeIndexBuffer.update(edgeIndexArray, gl.STATIC_DRAW);
                 this.program.attrib('edgeIndex', edgeIndexBuffer, 1);
             }
-
 
             if (this.textureData.length != edgeCount) {
                 this.textureData = new TextureData(edgeRows, edgeCount);

@@ -70,7 +70,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
         const { /*width, height, */run, children, style, /*backgroundColor,*/ onClickNode, selectedNodeId } = this.props;
         const { backgroundColor, width, height} = style;
 
-        const strokeColor = Color(backgroundColor).lighten(10).toString();
+        const defaulltStrokeColor = Color(backgroundColor).lighten(10).toString();
         const diagramHeight = height;
         const diagramWidth = width;
         const composedStyle = {
@@ -97,10 +97,10 @@ export class EdgeFlow extends React.Component<IProps, IState> {
             <g>{
                 allLinks.map(link => <path key={link.from.id + "-" + link.linkTo}
                     d={`M${style[link.from.id + "-" + link.linkTo + "-fromX"]} ${style[link.from.id + "-" + link.linkTo + "-fromY"]} L${style[link.from.id + "-" + link.linkTo + "-toX"]} ${style[link.from.id + "-" + link.linkTo + "-toY"]}`}
-                    stroke={strokeColor}
-                    opacity={0.1}
+                    stroke={link.pathColor || defaulltStrokeColor}
+                    opacity={link.pathOpacity || 0.1}
                     fill="transparent"
-                    strokeWidth={12}
+                    strokeWidth={link.pathWidth || 12}
                 />)
             }</g>;
 

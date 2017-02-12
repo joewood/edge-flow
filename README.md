@@ -29,14 +29,14 @@ import { EdgeFlow, Node, Edge } from "edge-flow"
     render() {
         return (
             <EdgeFlow backgroundColor="#0f0f0f" height={600} width={600} run={true}>
-                <Node key="1" id="node-1" label="node-1' x={30} y={20} labelColor="white">
-                    <Edge linkTo="node-2" ratePerSecond={30} color="blue" />
+                <Node key="1" id="node-1" label="node-1' x={30} y={20} labelColor="white" >
+                    <Edge linkTo="node-2" ratePerSecond={30} color="blue" size={2} />
                 </Node>
                 <Node key="2" id="node-2" label="node-2' x={530} y={120} labelColor="white">
-                    <Edge linkTo="node-3" ratePerSecond={30} variationMin={-0.01} variationMax={0.05} color="red" />
+                    <Edge linkTo="node-3" ratePerSecond={30} variationMin={-0.01} variationMax={0.05} color="red" shape={0.2}/>
                 </Node>
                 <Node key="3" id="node-3" label="node-3' x={330} y={520} labelColor="white">
-                    <Edge linkTo="node-1" ratePerSecond={30} variationMin={-0.06} variationMax={0.06} color="pink" />
+                    <Edge linkTo="node-1" ratePerSecond={30} variationMin={-0.06} variationMax={0.06} color="pink" shape={0.8} size={10} />
                 </Node>
             </EdgeFlow>
         );
@@ -65,6 +65,10 @@ id              | string   | Used to identify the node (for edges)
 x,y             | number   | Location of Node (auto-scales)
 label?          | string   | Label attached to the Node
 labelColor?     | string   | Color of the label text
+symbol?         | string   | String used for a font-icon (e.g. FontAwesome)
+symbolColor?    | string   | Color for symbol font-icon
+symbolSize?     | number   | Size of font-icon
+symbolFont?     | string   | Symbol Font name (e.g. "fontawesome")
 
 ## Edge
 
@@ -77,3 +81,9 @@ ratePerSecond   | number   | How many particles animating per second through the
 variationMin?   | number   | The minimum width of the Edge for random dispersal (default -0.01)
 variationMax?   | number   | The maximum width of the Edge for random dispersal (default 0.01)
 color?          | string   | Color of the particle 
+shape?          | number   | Roundness of particle range 0..1 - 1 being circle, 0 being square
+size?           | number   | Size of the particles (range 1..20)
+pathColor?      | string   | Color of the edge's path (defaults to lighter shade of canvas background)
+pathWidth?      | number   | Width of the line for the edge's path (default 12)
+pathOpacity?    | number   | Opacity of the path for the edge (default is 0.2)
+

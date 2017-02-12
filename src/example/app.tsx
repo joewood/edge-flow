@@ -75,8 +75,11 @@ class App extends React.Component<any, IState> {
                 {
                        [...points.map((p, i) =>
                         <Node key={"node" + i} id={"node" + i} label={i.toString()} x={p.x} y={p.y} labelColor="white" >
-                            <Edge linkTo={"node" + (i + 1) % numPoints} ratePerSecond={10} variationMin={-0.03} variationMax={0.03} size={10.0} shape={i/points.length} color={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`} />
-                            <Edge linkTo={"nodep-" + Math.floor(i / points.length * 4)} ratePerSecond={15 + i * 2} color="#e0ffe0" size={10.0}  shape={1-i/points.length} />
+                            <Edge linkTo={"node" + (i + 1) % numPoints} ratePerSecond={7} variationMin={-0.1} variationMax={0.1} 
+                                    size={5.0} shape={0.0} pathOpacity={0.05}
+                                    color={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`} 
+                                    pathColor={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`} />
+                            <Edge linkTo={"nodep-" + Math.floor(i / points.length * 4)} ratePerSecond={10} color="#e0ffe0" size={8}  shape={1.0} pathWidth={3} pathOpacity={0.02}/>
                         </Node>),
                     <Node key="nodep-0" id="nodep-0" x={radius + radius / 4} y={radius + radius / 4} />,
                     <Node key="nodep-1" id="nodep-1" x={radius - radius / 4} y={radius + radius / 4} />,
