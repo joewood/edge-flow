@@ -31,7 +31,7 @@ export default class Particles {
     private color: string;
     private running = false;
     private igloo: Igloo;
-    private drawProgram: Program;
+    private program: Program;
     private texture: WebGLTexture = null;
     private raf: number = 0;
 
@@ -48,7 +48,7 @@ export default class Particles {
         const vertexShaderText = vertexShader;
         const pixelShaderText = pixelShader;
 
-        this.drawProgram = this.igloo.program(vertexShaderText, pixelShaderText);
+        this.program = this.igloo.program(vertexShaderText, pixelShaderText);
         const gl = igloo.gl;
 
         gl.getExtension('OES_texture_float_linear');
@@ -68,66 +68,67 @@ export default class Particles {
     }
 
 
-    /** Set a new particle count.   */
-    public updateBuffers(flows: IFlow[], width: number, height: number) {
+    /** If the vertices have changed then update the buffers   */
+    public updateBuffers(edges: IFlow[], width: number, height: number) {
         try {
             const gl = this.igloo.gl;
-            const pointCount = flows.reduce((p, c) => c.ratePerSecond + p, 0);
-            const edgeCount = flows.length;
+            const particleCount = edges.reduce((p, c) => c.ratePerSecond + p, 0);
+            const edgeCount = edges.length;
+            this.worldsize = new Float32Array([width, height]);
 
-            if (pointCount != this.count) {
-                console.log("Updating Edge Data: " + pointCount);
-                this.count = pointCount;
+            // if the total particle count has changed then we need to change the associations
+            // between the particle and the vertex data (edge) 
+            if (particleCount != this.count) {
+                console.log("Updating Edge Data: " + particleCount);
+                this.count = particleCount;
                 let i = 0;
-                const edgeIndexArray = new Float32Array(pointCount);
-                const timeOffsetArray = new Float32Array(pointCount);
+                const edgeIndexArray = new Float32Array(particleCount);
+                const timeOffsetArray = new Float32Array(particleCount);
                 let edgeIndex = 0;
-                for (let flow of flows) {
-                    for (let n = 0; n < flow.ratePerSecond; n++) {
+                for (let edge of edges) {
+                    for (let n = 0; n < edge.ratePerSecond; n++) {
                         timeOffsetArray[i] = Math.random();
                         edgeIndexArray[i] = edgeIndex;
                         i++;
                     }
                     edgeIndex++;
                 }
-                this.drawProgram.use();
+                this.program.use();
                 // update time
                 const timeBuffer = this.igloo.array(timeOffsetArray, gl.STATIC_DRAW);
                 timeBuffer.update(timeOffsetArray, gl.STATIC_DRAW);
-                this.drawProgram.attrib('time', timeBuffer, 1);
+                this.program.attrib('time', timeBuffer, 1);
                 // update edge Index
                 const edgeIndexBuffer = this.igloo.array(edgeIndexArray, gl.STATIC_DRAW);
                 edgeIndexBuffer.update(edgeIndexArray, gl.STATIC_DRAW);
-                this.drawProgram.attrib('edgeIndex', edgeIndexBuffer, 1);
+                this.program.attrib('edgeIndex', edgeIndexBuffer, 1);
             }
 
-            this.worldsize = new Float32Array([width, height]);
-            const w = this.worldsize[0];
-            const h = this.worldsize[1];
 
             if (this.textureData.length != edgeCount) {
                 this.textureData = new TextureData(edgeRows, edgeCount);
             }
             const nodeVariation = 0.005;
             let edgeIndex = 0;
-            for (let flow of flows) {
+            // update the texture Data, each row is a different attribute of the edge
+            for (let edge of edges) {
                 // set-up vertices in edgedata
-                this.textureData.setValue(vertexRow, edgeIndex, flow.fromX, flow.fromY, flow.toX, flow.toY);
-
-                this.textureData.setValue(variationRow, edgeIndex, flow.variationMin || -0.01, flow.variationMax || 0.01, (flow.variationMax || 0.01) - (flow.variationMin || -0.01), Math.random());
+                this.textureData.setValue(vertexRow, edgeIndex, edge.fromX, edge.fromY, edge.toX, edge.toY);
+                // random variation of the particles
+                this.textureData.setValue(variationRow, edgeIndex, edge.variationMin || -0.01, edge.variationMax || 0.01, (edge.variationMax || 0.01) - (edge.variationMin || -0.01), Math.random());
                 // set-up color in edge Data
-                this.textureData.setColor(colorRow, edgeIndex, flow.color || this.color);
+                this.textureData.setColor(colorRow, edgeIndex, edge.color || this.color);
                 // set-up shape
-                this.textureData.setValue(shapeRow, edgeIndex, (flow.size || this.size || 8.0) / 256, flow.shape || 0.0, 0.0, 0.0);
+                this.textureData.setValue(shapeRow, edgeIndex, (edge.size || this.size || 8.0) / 256, edge.shape || 0.0, 0.0, 0.0);
 
                 edgeIndex++;
             }
-            this.drawProgram.use();
+            this.program.use();
 
-            this.drawProgram.uniform('edgeCount', this.textureData.lengthPower2);
+            this.program.uniform('edgeCount', this.textureData.lengthPower2);
             const edgeTexture = this.textureData.bindTexture(this.igloo.gl, gl.TEXTURE0);
 
-            this.drawProgram.uniform('edgeData', 0, true);
+            this.program.uniform('edgeData', 0, true);
         }
         catch (e) {
             console.error("UpdateBuffers", e);
@@ -147,15 +148,15 @@ export default class Particles {
             this.backgroundColor ? this.backgroundColor.g / 256 : 0,
             this.backgroundColor ? this.backgroundColor.b / 256 : 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
-        this.drawProgram.use();
-        this.drawProgram.uniform('second', ((new Date().valueOf() % 2000) / 2000.0));
-        this.drawProgram.uniform('worldsize', this.worldsize);
+        this.program.use();
+        this.program.uniform('second', ((new Date().valueOf() % 2000) / 2000.0));
+        this.program.uniform('worldsize', this.worldsize);
         // this.drawProgram.uniform('size', this.size);
-        this.drawProgram.uniform('edgeData', 0, true);
+        this.program.uniform('edgeData', 0, true);
 
         const background = Color(this.color).array();
-        this.drawProgram.uniform('color', [background[0] / 255, background[1] / 255, background[2] / 255, 1.0]);
-        this.drawProgram.draw(gl.POINTS, this.count);
+        this.program.uniform('color', [background[0] / 255, background[1] / 255, background[2] / 255, 1.0]);
+        this.program.draw(gl.POINTS, this.count);
         return this;
     };
 
