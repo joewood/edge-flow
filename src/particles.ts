@@ -1,8 +1,10 @@
 import Igloo, { Program, Buffer, Texture } from "igloo-ts";
 const seedRandom = require("seedrandom");
-const vertexShader = require ("./shaders/vertex.glsl");
-const pixelShader = require ("./shaders/pixel.glsl");
+const vertexShader = require("./shaders/vertex.glsl");
+const pixelShader = require("./shaders/pixel.glsl");
 import Color = require("color");
+import TextureData from "./texture-data";
+
 
 export interface IFlow {
     fromX: number;
@@ -17,8 +19,14 @@ export interface IFlow {
     variationMax?: number;
 }
 
-export default class Particles {
 
+const colorRow = 0;
+const vertexRow = 1;
+const variationRow = 2;
+const shapeRow = 3;
+const edgeRows = 4;
+
+export default class Particles {
     private worldsize: Float32Array;
     private color: string;
     private running = false;
@@ -29,7 +37,7 @@ export default class Particles {
 
     public backgroundColor: { r: number, g: number, b: number } = null;
     private count: number;
-    private edgeTexData: Float32Array;
+    private textureData: TextureData;
 
     /**
      * @param nparticles initial particle count
@@ -49,10 +57,9 @@ export default class Particles {
         const h = canvas.height;
         gl.disable(gl.DEPTH_TEST);
         this.worldsize = new Float32Array([w, h]);
-        this.edgeTexData = new Float32Array([0, 0]);
+        this.textureData = new TextureData(2, edgeRows);
         /* Drawing parameters. */
         this.color = "blue";
-
         console.log("Initialized Particle system")
     }
 
@@ -60,34 +67,16 @@ export default class Particles {
         return this.running;
     }
 
-    private textureFromFloats(gl: WebGLRenderingContext, width: number, height: number, float32Array: Float32Array): WebGLTexture {
-        var oldActive = gl.getParameter(gl.ACTIVE_TEXTURE);
-        if (this.texture) gl.deleteTexture(this.texture);
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-            width, height, 0,
-            gl.RGBA, gl.FLOAT, float32Array);
-
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.bindTexture(gl.TEXTURE_2D, null);
-
-        gl.activeTexture(gl.TEXTURE0); // working register 31, thanks.
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        // gl.activeTexture(oldActive);
-        return this.texture;
-    }
 
     /** Set a new particle count.   */
-    public updateBuffers(flows: IFlow[],width:number,height:number) {
+    public updateBuffers(flows: IFlow[], width: number, height: number) {
         try {
             const gl = this.igloo.gl;
             const pointCount = flows.reduce((p, c) => c.ratePerSecond + p, 0);
             const edgeCount = flows.length;
 
             if (pointCount != this.count) {
-                console.log("Updating Time: " + pointCount);
+                console.log("Updating Edge Data: " + pointCount);
                 this.count = pointCount;
                 let i = 0;
                 const edgeIndexArray = new Float32Array(pointCount);
@@ -115,53 +104,28 @@ export default class Particles {
             this.worldsize = new Float32Array([width, height]);
             const w = this.worldsize[0];
             const h = this.worldsize[1];
-            const edgeCountPower = 2 ** Math.ceil(Math.log2(edgeCount));
-            // edge buffer
-            // edge buffer usage:
-            const colorRow = 0;
-            const vertexRow = 1;
-            const variationRow = 2;
-            const shapeRow = 3;
-            // row #0 - colors
-            // row #1 - fromx,fromy,tox,toy
-            const edgeRows = 4;
-            const edgeRowsPower = 2 ** Math.ceil(Math.log2(edgeRows));
 
-            if (this.edgeTexData.length != edgeCountPower * 4 * edgeRowsPower) {
-                this.edgeTexData = new Float32Array(edgeCountPower * 4 * edgeRowsPower);
+            if (this.textureData.length != edgeCount) {
+                this.textureData = new TextureData(edgeRows, edgeCount);
             }
-            // console.log(`Texture ${edgeCountPower} ${edgeRowsPower}`)
             const nodeVariation = 0.005;
             let edgeIndex = 0;
             for (let flow of flows) {
                 // set-up vertices in edgedata
-                this.edgeTexData[edgeIndex * 4 + vertexRow * edgeCountPower * 4] = flow.fromX;
-                this.edgeTexData[edgeIndex * 4 + 1 + vertexRow * edgeCountPower * 4] = flow.fromY;
-                this.edgeTexData[edgeIndex * 4 + 2 + vertexRow * edgeCountPower * 4] = flow.toX;
-                this.edgeTexData[edgeIndex * 4 + 3 + vertexRow * edgeCountPower * 4] = flow.toY;
+                this.textureData.setValue(vertexRow, edgeIndex, flow.fromX, flow.fromY, flow.toX, flow.toY);
 
-                this.edgeTexData[edgeIndex * 4 + variationRow * edgeCountPower * 4] = flow.variationMin || -0.01;
-                this.edgeTexData[edgeIndex * 4 + 1 + variationRow * edgeCountPower * 4] = flow.variationMax || 0.01;
-                this.edgeTexData[edgeIndex * 4 + 2 + variationRow * edgeCountPower * 4] = (flow.variationMax || 0.01) - (flow.variationMin || -0.01);
-                this.edgeTexData[edgeIndex * 4 + 3 + variationRow * edgeCountPower * 4] = Math.random();
+                this.textureData.setValue(variationRow, edgeIndex, flow.variationMin || -0.01, flow.variationMax || 0.01, (flow.variationMax || 0.01) - (flow.variationMin || -0.01), Math.random());
                 // set-up color in edge Data
-                const edgeColor = Color(flow.color || this.color).array();
-                this.edgeTexData[edgeIndex * 4 + colorRow * edgeCountPower * 4] = edgeColor[0] / 256;
-                this.edgeTexData[edgeIndex * 4 + 1 + colorRow * edgeCountPower * 4] = edgeColor[1] / 256;
-                this.edgeTexData[edgeIndex * 4 + 2 + colorRow * edgeCountPower * 4] = edgeColor[2] / 256;
-                this.edgeTexData[edgeIndex * 4 + 3 + colorRow * edgeCountPower * 4] = 1.0;
+                this.textureData.setColor(colorRow, edgeIndex, flow.color || this.color);
                 // set-up shape
-                this.edgeTexData[edgeIndex*4 + shapeRow * edgeCountPower*4] = (flow.size || this.size || 8.0) / 256;
-                this.edgeTexData[edgeIndex*4 + 1+shapeRow * edgeCountPower*4] = flow.shape || 0.0;
-                this.edgeTexData[edgeIndex*4 + 2+shapeRow * edgeCountPower*4] = 0;
-                this.edgeTexData[edgeIndex*4 + 3+shapeRow * edgeCountPower*4] = 0;
-                
+                this.textureData.setValue(shapeRow, edgeIndex, (flow.size || this.size || 8.0) / 256, flow.shape || 0.0, 0.0, 0.0);
+
                 edgeIndex++;
             }
             this.drawProgram.use();
 
-            this.drawProgram.uniform('edgeCount', edgeCountPower);
-            const edgeTexture = this.textureFromFloats(this.igloo.gl, edgeCountPower, edgeRowsPower, this.edgeTexData);
+            this.drawProgram.uniform('edgeCount', this.textureData.lengthPower2);
+            const edgeTexture = this.textureData.bindTexture(this.igloo.gl, gl.TEXTURE0);
 
             this.drawProgram.uniform('edgeData', 0, true);
         }
