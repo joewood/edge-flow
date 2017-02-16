@@ -1,44 +1,33 @@
 import * as React from "react"
 import * as ReactDOM from 'react-dom'
 import { range } from "lodash";
-import { EdgeFlow, Node, Edge } from ".."
+import Swirl from "./swirl";
+import Partition from "./partition"
+
+enum Screen { SWIRL, SIMPLE, PARTITION };
 
 interface IState {
-    animationIndex: number;
-    points: { x: number, y: number }[];
+    screen: Screen;
     width?: number;
     height?: number;
     animate?: boolean;
-}
-
-const radius = 200;
-
-function circlePoint(i: number, length: number) {
-    const angle = (i % length) / length * 2 * Math.PI;
-    return {
-        x: radius + radius * Math.cos(angle),
-        y: radius + radius * Math.sin(angle)
-    };
-}
-
-function segment(p: number): string {
-    return p < radius ? "0" : "1";
+    animationIndex: number;
 }
 
 class App extends React.Component<any, IState> {
-    private timer: number;
     private resizeHandler: EventListenerOrEventListenerObject;
     private div: HTMLDivElement;
+    private timer: number;
 
     constructor(p: any) {
         super(p);
         this.state = {
-            animationIndex: 0,
-            points: range(0, 24).map((pt, i, arr) => circlePoint(i, arr.length)),
+            screen: Screen.PARTITION,
             height: 300,
             width: 300,
-            animate: true
-        };
+            animate: false,
+            animationIndex: 0
+        }
     }
 
     private onResize = () => {
@@ -46,16 +35,10 @@ class App extends React.Component<any, IState> {
         this.setState({ width: document.getElementById("root").clientWidth, height: document.getElementById("root").clientHeight });
     }
 
-    private moveNext = () => {
-        const animationIndex = this.state.animationIndex + 1;
-        const points = this.state.points.map((pt, i, arr) => circlePoint(i + animationIndex, arr.length));
-        this.setState({ animationIndex: animationIndex, points: points });
-    }
-
     private componentDidMount() {
         this.timer = window.setInterval(this.moveNext, 2000)
         window.addEventListener("resize", this.onResize);
-        this.setState({ width: document.getElementById("root").clientWidth, height: document.getElementById("root").clientHeight-20 });
+        this.setState({ width: document.getElementById("root").clientWidth, height: document.getElementById("root").clientHeight - 20 });
     }
 
     private componentWillUnmount() {
@@ -63,35 +46,33 @@ class App extends React.Component<any, IState> {
         window.removeEventListener("resize", this.onResize);
     }
 
+    private moveNext = () => {
+        if (!this.state.animate) return;
+        const animationIndex = this.state.animationIndex + 1;
+        this.setState({ animationIndex: animationIndex });
+    }
 
-    render() {
-        const { points, width, height} = this.state;
-        const numPoints = points.length;
-        return <div key="root"
-            style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black",height:height,width:width,overflow:"hidden" }}
+    public render() {
+        const {screen, width, height, animate, animationIndex} = this.state;
+        console.log(`${width} ${height}`);
+        const buttonStyle = { height: 50, width: 130, margin: 5, color: "black" };
+        return (<div key="root" id="root"
+            style={{ backgroundColor: "green", overflow: "hidden" }}
             ref={div => this.div = div}>
-            <p style={{ color: "white", height: 20 }} onClick={() => this.setState({ animate: !this.state.animate })}>Click to Pause</p>
-            <EdgeFlow style={{ height: height*0.8 - 20, width: width*0.8, backgroundColor: "#0f0f0f" }} run={this.state.animate} >
-                {
-                       [...points.map((p, i) =>
-                        <Node key={"node" + i} id={"node" + i} label={i.toString()} x={p.x} y={p.y} labelColor="white" >
-                            <Edge linkTo={"node" + (i + 1) % numPoints} ratePerSecond={7} variationMin={-0.1} variationMax={0.1} 
-                                    size={5.0} shape={0.0} pathOpacity={0.05}
-                                    color={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`} 
-                                    pathColor={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`} />
-                            <Edge linkTo={"nodep-" + Math.floor(i / points.length * 4)} ratePerSecond={10} color="#e0ffe0" size={8}  
-                                shape={1.0} pathWidth={3} pathOpacity={0.001}
-                                endingColor="rgba(192,255,192,0.0)"
-                                />
-                        </Node>),
-                    <Node key="nodep-0" id="nodep-0" x={radius + radius / 8} y={radius + radius / 8} group />,
-                    <Node key="nodep-1" id="nodep-1" x={radius - radius / 8} y={radius + radius / 8} group />,
-                    <Node key="nodep-2" id="nodep-2" x={radius - radius / 8} y={radius - radius / 8} group />,
-                    <Node key="nodep-3" id="nodep-3" x={radius + radius / 8} y={radius - radius / 8} group />
-                    ]
-                }
-            </EdgeFlow>
-        </div>;
+            <div style={{ height: 60 }}>
+                <button key="pause" style={buttonStyle}
+                    onClick={() => this.setState({ animate: !this.state.animate })}>Pause</button>
+                <button key="swirl" style={buttonStyle}
+                    onClick={() => this.setState({ screen: Screen.SWIRL })}>Swirl</button>
+                <button key="partition" style={buttonStyle}
+                       onClick={() => this.setState({ screen: Screen.PARTITION })}>Partition</button>
+            </div>
+            {screen == Screen.SWIRL ?
+                <Swirl animate={animate} animationIndex={animationIndex} height={height-60} width={width} />
+                : <Partition animate={animate} animationIndex={animationIndex} height={height-60} width={width} />
+            }
+        </div>
+        )
     }
 }
 

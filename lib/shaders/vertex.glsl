@@ -32,12 +32,8 @@ void main() {
     shape = shapes.y;
     float seed = variations.w;
     float rnd = random(vec2(time,0));
-    vec2 from = pts.xy;
-    vec2 to = pts.zw;
-    if (variations.z!=0.0) {
-     pts.xy += (nodeVariation * rnd-nodeVariation/2.0); 
-    to += (nodeVariation * rnd-nodeVariation/2.0);
-    }
+    vec2 from = pts.xy + nodeVariation * rnd; 
+    vec2 to = pts.zw + nodeVariation * rnd;
     vec2 middle = vec2(rnd * variations.z + variations.x,rnd * variations.z + variations.x);
 
     // position is linear between source and target

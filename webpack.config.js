@@ -12,8 +12,7 @@ module.exports = {
   },
   module: {
     loaders: [
-      { test: /\.ts.?$/, loader: 'ts-loader' },
-      { test: /\.glsl$/, loader: 'raw-loader' }
+      { test: /\.ts.?$/, loader: 'ts-loader' }
     ]
   }
 }

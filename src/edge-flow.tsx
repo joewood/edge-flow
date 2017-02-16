@@ -24,7 +24,7 @@ export interface NodeClickEventArgs {
 export interface IProps {
     // text?: string;
     run?: boolean;
-    style?: {
+    style: {
         width: number;
         height: number;
         backgroundColor?: string;
@@ -53,22 +53,30 @@ function getChildrenProps<T>(children: React.ReactNode): T[] {
 }
 
 export class EdgeFlow extends React.Component<IProps, IState> {
-    private rootDiv: HTMLDivElement = null;
+    // private rootDiv: HTMLDivElement = null;
 
     constructor(p: IProps) {
         super(p);
-        this.state = { width: 100, height: 100 };
+        this.state = {};
     }
 
-    private onResize = () => {
-        if (this.rootDiv) this.setState({ width: this.rootDiv.clientWidth, height: this.rootDiv.clientHeight });
-    }
+    // private onResize = () => {
+    //     if (this.rootDiv) this.setState({ width: this.rootDiv.clientWidth, height: this.rootDiv.clientHeight });
+    // }
 
     public render() {
         const nodes = getChildrenProps<INodeProps>(this.props.children) || [];
+        const errorNodes = nodes.filter(n => n.x === undefined || isNaN(n.x) || n.y === undefined || isNaN(n.y));
+        if (errorNodes.length > 0) {
+            console.error("Missing X/Y", errorNodes);
+            throw "Error Nodes";
+        }
         const nodeDict = keyBy(nodes, n => n.id);
-        const { /*width, height, */run, children, style, /*backgroundColor,*/ onClickNode, selectedNodeId } = this.props;
+        const { run, children, style, onClickNode, selectedNodeId } = this.props;
         const { backgroundColor, width, height} = style;
+        if (!width || isNaN(width) || !height || isNaN(height)) {
+            throw "Invalid Height/Width";
+        }
 
         const defaulltStrokeColor = Color(backgroundColor).lighten(10).toString();
         const diagramHeight = height;
@@ -78,8 +86,12 @@ export class EdgeFlow extends React.Component<IProps, IState> {
             ...style
         };
         if (nodes.length === 0) return <div />;
-        const max = { x: maxBy(nodes, n => n.x).x, y: maxBy(nodes, n => n.y).y };
-        const min = { x: minBy(nodes, n => n.x).x, y: minBy(nodes, n => n.y).y };
+        const max = { x: maxBy(nodes, n => n.x).x*1.1, y: maxBy(nodes, n => n.y).y*1.1 };
+        const min = { x: minBy(nodes, n => n.x).x*0.9, y: minBy(nodes, n => n.y).y*0.9 };
+        // console.log("min",min);
+        // console.log("max",max);
+        // console.log("diagramHeight",diagramHeight);
+        // console.log("diagramWidth",diagramWidth);
 
         const scaleX = (x: number) => ((x - min.x) + (max.x - min.x) * 0.08) / ((max.x - min.x) * 1.16) * diagramWidth;
         const scaleY = (y: number) => ((y - min.y) + (max.y - min.y) * 0.08) / ((max.y - min.y) * 1.16) * diagramHeight;
@@ -93,22 +105,34 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                 .map(l => ({ from: node, ...l } as EdgeAndNodeType))
         ], [] as EdgeAndNodeType[]);
 
+        const missingLinks = allLinks.filter(l => !nodeDict[l.linkTo]);
+        if (missingLinks.length > 0) {
+            console.error("Edges with Missing targets", missingLinks);
+            throw ("MIssing Target");
+        }
+
         const svgLineFn = style =>
             <g>{
-                allLinks.map(link => <path key={link.from.id + "-" + link.linkTo}
-                    d={`M${style[link.from.id + "-" + link.linkTo + "-fromX"]} ${style[link.from.id + "-" + link.linkTo + "-fromY"]} L${style[link.from.id + "-" + link.linkTo + "-toX"]} ${style[link.from.id + "-" + link.linkTo + "-toY"]}`}
-                    stroke={link.pathColor || defaulltStrokeColor}
-                    opacity={link.pathOpacity || 0.1}
-                    fill="transparent"
-                    strokeWidth={link.pathWidth || 12}
-                />)
+                allLinks.map(link => {
+                    const styleX = style[link.from.id + "-" + link.linkTo + "-fromX"];
+                    const styleY = style[link.from.id + "-" + link.linkTo + "-fromY"];
+                    const styletoX = style[link.from.id + "-" + link.linkTo + "-toX"];
+                    const styletoY = style[link.from.id + "-" + link.linkTo + "-toY"];
+                    if (!styleX || !styleY || !styletoX || !styletoY) throw "Invalid Style";
+                    return <path key={link.from.id + "-" + link.linkTo}
+                        d={`M${styleX} ${styleY} L${styletoX} ${styletoY}`}
+                        stroke={link.pathColor || defaulltStrokeColor}
+                        opacity={link.pathOpacity || 0.1}
+                        fill="transparent"
+                        strokeWidth={link.pathWidth || 12}
+                    />;
+                })
             }</g>;
 
         return (
             <div key="root" style={composedStyle} >
                 <svg width={width} height={height} style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
-                    onClick={() => onClickNode({ nodeId: null, graph: null, screen: null })}
-                >
+                    onClick={() => onClickNode({ nodeId: null, graph: null, screen: null })}>
                     <Motion defaultStyle={allLinks.reduce((p, link) => ({
                         [link.from.id + "-" + link.linkTo + "-fromX"]: scaleX(link.from.x),
                         [link.from.id + "-" + link.linkTo + "-fromY"]: scaleY(link.from.y),

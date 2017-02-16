@@ -1,6 +1,6 @@
 {
   "name": "edge-flow",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "React Component using Particle System to animate data-flow",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -33,7 +33,6 @@
     "@types/react-dom": "^0.14.20",
     "@types/react-motion": "^0.0.21",
     "@types/webpack": "^2.2.2",
-    "raw-loader": "^0.5.1",
     "ts-loader": "^2.0.0",
     "typescript": "^2.1.6"
   },

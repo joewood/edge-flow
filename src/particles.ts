@@ -1,6 +1,6 @@
 import Igloo, { Program, Buffer, Texture } from "igloo-ts";
-const vertexShader = require("./shaders/vertex.glsl");
-const pixelShader = require("./shaders/pixel.glsl");
+const vertexShader = require("./loader/raw-loader!./shaders/vertex.glsl");
+const pixelShader = require("./loader/raw-loader!./shaders/pixel.glsl");
 import Color = require("color");
 import TextureData from "./texture-data";
 import { IEdge as IModelEdge } from "./flow-node"
@@ -80,7 +80,7 @@ export default class Particles {
                 let edgeIndex = 0;
                 for (let edge of edges) {
                     for (let n = 0; n < edge.ratePerSecond; n++) {
-                        timeOffsetArray[i] = Math.random();
+                        timeOffsetArray[i] = edge.nonrandom ? (n / edge.ratePerSecond) : Math.random();
                         edgeIndexArray[i] = edgeIndex;
                         i++;
                     }
@@ -101,14 +101,15 @@ export default class Particles {
                 this.textureData = new TextureData(edgeRows, edgeCount);
                 console.log(`Allocated Texture ${this.textureData.lengthPower2} x ${this.textureData.rowsPower2}`)
             }
-            const nodeVariation = 0.005;
             let edgeIndex = 0;
             // update the texture Data, each row is a different attribute of the edge
             for (let edge of edges) {
+                const variationMin = (edge.variationMin === undefined) ? -0.01 : edge.variationMin;
+                const variationMax = (edge.variationMax === undefined) ? 0.01 : edge.variationMax;
                 // set-up vertices in edgedata
                 this.textureData.setValue(vertexRow, edgeIndex, edge.fromX, edge.fromY, edge.toX, edge.toY);
                 // random variation of the particles
-                this.textureData.setValue(variationRow, edgeIndex, edge.variationMin || -0.01, edge.variationMax || 0.01, (edge.variationMax || 0.01) - (edge.variationMin || -0.01), Math.random());
+                this.textureData.setValue(variationRow, edgeIndex, variationMin, variationMax, variationMax - variationMin, Math.random());
                 // set-up color in edge Data
                 this.textureData.setColor(colorRow, edgeIndex, edge.color || this.color);
                 this.textureData.setColor(endColorRow, edgeIndex, edge.endingColor || edge.color || this.color);
