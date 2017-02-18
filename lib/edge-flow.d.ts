@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import * as React from "react";
-import { Node } from "./flow-node";
+import { Node } from "./model";
 export { Node, Edge, INode, IEdge, IEdgeProps, INodeProps } from "./flow-node";
 export interface NodeClickEventArgs {
     nodeId: string;

@@ -2,9 +2,9 @@ import * as React from "react";
 import Particles from "./particles";
 // old way of doing Color import
 import Color = require("color");
-import { IFlow } from './particles'
+import { IParticleEdge } from './particles'
 
-export class Step extends React.Component<IFlow, any> {
+export class ParticleEdge extends React.Component<IParticleEdge, any> {
     public render() {
         return null;
     }
@@ -13,12 +13,12 @@ export class Step extends React.Component<IFlow, any> {
 export interface IProps {
     width: number;
     height: number;
-    children?: Step[];
+    children?: ParticleEdge[];
     run?: boolean;
     backgroundColor?: string;
 }
 
-export class Flow extends React.PureComponent<IProps, any> {
+export class ParticleCanvas extends React.PureComponent<IProps, any> {
     private canvas: HTMLCanvasElement;
     private particles: Particles;
 
@@ -28,7 +28,7 @@ export class Flow extends React.PureComponent<IProps, any> {
         const background = Color(props.backgroundColor);
         // this.particles.stop();
         const flowsAny = React.Children.map(props.children, c => (c as any).props.style ? (c as any).valueOf() : c) || [];
-        const flows = flowsAny.map(fa => fa.props as IFlow);
+        const flows = flowsAny.map(fa => fa.props as IParticleEdge);
         this.particles.backgroundColor = { r: background.red(), g: background.green(), b: background.blue() };
         this.particles.updateBuffers(flows, props.width, props.height);
         this.particles.draw();

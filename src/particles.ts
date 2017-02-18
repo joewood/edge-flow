@@ -3,9 +3,9 @@ const vertexShader = require("./loader/raw-loader!./shaders/vertex.glsl");
 const pixelShader = require("./loader/raw-loader!./shaders/pixel.glsl");
 import Color = require("color");
 import TextureData from "./texture-data";
-import { IEdge as IModelEdge } from "./flow-node"
+import { IEdge as IModelEdge } from "./model"
 
-export interface IFlow extends IModelEdge {
+export interface IParticleEdge extends IModelEdge {
     fromX: number;
     fromY: number;
     toX: number;
@@ -62,7 +62,7 @@ export default class Particles {
 
 
     /** If the vertices have changed then update the buffers   */
-    public updateBuffers(edges: IFlow[], width: number, height: number) {
+    public updateBuffers(edges: IParticleEdge[], width: number, height: number) {
         try {
             const gl = this.igloo.gl;
             const particleCount = edges.reduce((p, c) => c.ratePerSecond + p, 0);

@@ -4,16 +4,18 @@
 
 import * as React from "react";
 import { maxBy, minBy, flatten, values, keyBy, Dictionary } from "lodash";
-
-import { Flow, Step } from "./flow";
-import { Node, Edge, INodeProps, IEdgeProps, INode, IEdge } from "./flow-node";
-export { Node, Edge, INode, IEdge, IEdgeProps, INodeProps } from "./flow-node";
-
 import { WrappedSvgText } from "./svg-components"
 import Color = require("color");
 import { Motion, spring as _Spring } from "react-motion";
-const spring = _Spring; //(v: number) => oldSpring(v, { damping: 10, stiffness: 80 });
 
+import { ParticleCanvas, ParticleEdge } from "./particle-canvas";
+import { Edge, IEdgeProps } from "./edge-flow-edge";
+import { Node, INodeProps } from "./edge-flow-node";
+
+export { Edge, IEdgeProps } from "./edge-flow-edge"
+export { Node, INodeProps } from "./edge-flow-node";
+
+const spring = _Spring; //(v: number) => oldSpring(v, { damping: 10, stiffness: 80 });
 
 export interface NodeClickEventArgs {
     nodeId: string;
@@ -53,16 +55,11 @@ function getChildrenProps<T>(children: React.ReactNode): T[] {
 }
 
 export class EdgeFlow extends React.Component<IProps, IState> {
-    // private rootDiv: HTMLDivElement = null;
 
     constructor(p: IProps) {
         super(p);
         this.state = {};
     }
-
-    // private onResize = () => {
-    //     if (this.rootDiv) this.setState({ width: this.rootDiv.clientWidth, height: this.rootDiv.clientHeight });
-    // }
 
     public render() {
         const nodes = getChildrenProps<INodeProps>(this.props.children) || [];
@@ -88,43 +85,41 @@ export class EdgeFlow extends React.Component<IProps, IState> {
         if (nodes.length === 0) return <div />;
         const max = { x: maxBy(nodes, n => n.x).x*1.1, y: maxBy(nodes, n => n.y).y*1.1 };
         const min = { x: minBy(nodes, n => n.x).x*0.9, y: minBy(nodes, n => n.y).y*0.9 };
-        // console.log("min",min);
-        // console.log("max",max);
-        // console.log("diagramHeight",diagramHeight);
-        // console.log("diagramWidth",diagramWidth);
 
         const scaleX = (x: number) => ((x - min.x) + (max.x - min.x) * 0.08) / ((max.x - min.x) * 1.16) * diagramWidth;
         const scaleY = (y: number) => ((y - min.y) + (max.y - min.y) * 0.08) / ((max.y - min.y) * 1.16) * diagramHeight;
 
         type EdgeAndNodeType = IEdgeProps & { from: INodeProps };
 
-        const allLinks = nodes.reduce((p, node: INodeProps) => [
+        const allEdges = nodes.reduce((p, node: INodeProps) => [
             ...p,
             ...(getChildrenProps<IEdgeProps>(node.children) || [])
-                .filter(link => !isNaN(link.ratePerSecond) && (link.ratePerSecond > 0))
+                .filter(edge => !isNaN(edge.ratePerSecond) && (edge.ratePerSecond > 0))
                 .map(l => ({ from: node, ...l } as EdgeAndNodeType))
         ], [] as EdgeAndNodeType[]);
 
-        const missingLinks = allLinks.filter(l => !nodeDict[l.linkTo]);
-        if (missingLinks.length > 0) {
-            console.error("Edges with Missing targets", missingLinks);
+        const missingEdges = allEdges.filter(l => !nodeDict[l.linkTo]);
+        if (missingEdges.length > 0) {
+            console.error("Edges with Missing targets", missingEdges);
             throw ("MIssing Target");
         }
 
+        const compKey = (edge:EdgeAndNodeType,suffix:"fromX"|"fromY"|"toX"|"toY") =>edge.from.id + "-" + edge.linkTo + "-" + suffix;
+
         const svgLineFn = style =>
             <g>{
-                allLinks.map(link => {
-                    const styleX = style[link.from.id + "-" + link.linkTo + "-fromX"];
-                    const styleY = style[link.from.id + "-" + link.linkTo + "-fromY"];
-                    const styletoX = style[link.from.id + "-" + link.linkTo + "-toX"];
-                    const styletoY = style[link.from.id + "-" + link.linkTo + "-toY"];
+                allEdges.map(edge => {
+                    const styleX = style[compKey(edge,"fromX")];
+                    const styleY = style[compKey(edge,"fromY")];
+                    const styletoX = style[compKey(edge,"toX")];
+                    const styletoY = style[compKey(edge,"toY")];
                     if (!styleX || !styleY || !styletoX || !styletoY) throw "Invalid Style";
-                    return <path key={link.from.id + "-" + link.linkTo}
+                    return <path key={edge.from.id + "-" + edge.linkTo}
                         d={`M${styleX} ${styleY} L${styletoX} ${styletoY}`}
-                        stroke={link.pathColor || defaulltStrokeColor}
-                        opacity={link.pathOpacity || 0.1}
+                        stroke={edge.pathColor || defaulltStrokeColor}
+                        opacity={edge.pathOpacity || 0.1}
                         fill="transparent"
-                        strokeWidth={link.pathWidth || 12}
+                        strokeWidth={edge.pathWidth || 12}
                     />;
                 })
             }</g>;
@@ -133,18 +128,18 @@ export class EdgeFlow extends React.Component<IProps, IState> {
             <div key="root" style={composedStyle} >
                 <svg width={width} height={height} style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
                     onClick={() => onClickNode({ nodeId: null, graph: null, screen: null })}>
-                    <Motion defaultStyle={allLinks.reduce((p, link) => ({
-                        [link.from.id + "-" + link.linkTo + "-fromX"]: scaleX(link.from.x),
-                        [link.from.id + "-" + link.linkTo + "-fromY"]: scaleY(link.from.y),
-                        [link.from.id + "-" + link.linkTo + "-toX"]: scaleX(nodeDict[link.linkTo].x),
-                        [link.from.id + "-" + link.linkTo + "-toY"]: scaleY(nodeDict[link.linkTo].y),
+                    <Motion defaultStyle={allEdges.reduce((p, edge) => ({
+                        [compKey(edge,"fromX")]: scaleX(edge.from.x),
+                        [compKey(edge,"fromY")]: scaleY(edge.from.y),
+                        [compKey(edge,"toX")]: scaleX(nodeDict[edge.linkTo].x),
+                        [compKey(edge,"toY")]: scaleY(nodeDict[edge.linkTo].y),
                         ...p
                     }), {})}
-                        style={allLinks.reduce((p, link) => ({
-                            [link.from.id + "-" + link.linkTo + "-fromX"]: spring(scaleX(link.from.x)),
-                            [link.from.id + "-" + link.linkTo + "-fromY"]: spring(scaleY(link.from.y)),
-                            [link.from.id + "-" + link.linkTo + "-toX"]: spring(scaleX(nodeDict[link.linkTo].x)),
-                            [link.from.id + "-" + link.linkTo + "-toY"]: spring(scaleY(nodeDict[link.linkTo].y)),
+                        style={allEdges.reduce((p, edge) => ({
+                            [compKey(edge,"fromX")]: spring(scaleX(edge.from.x)),
+                            [compKey(edge,"fromY")]: spring(scaleY(edge.from.y)),
+                            [compKey(edge,"toX")]: spring(scaleX(nodeDict[edge.linkTo].x)),
+                            [compKey(edge,"toY")]: spring(scaleY(nodeDict[edge.linkTo].y)),
                             ...p
                         }), {})}>{svgLineFn}
                     </Motion>
@@ -202,39 +197,39 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                 </svg>
                 <div key="particleContainer"
                     style={{ pointerEvents: "none", position: "absolute", left: 0, top: 0 }}>
-                    <Motion defaultStyle={allLinks.reduce((p, link) => ({
-                        [link.from.id + "-" + link.linkTo + "-fromX"]: scaleX(link.from.x) / width,
-                        [link.from.id + "-" + link.linkTo + "-fromY"]: 1 - scaleY(link.from.y) / height,
-                        [link.from.id + "-" + link.linkTo + "-toX"]: scaleX(nodeDict[link.linkTo].x) / width,
-                        [link.from.id + "-" + link.linkTo + "-toY"]: 1 - scaleY(nodeDict[link.linkTo].y) / height,
+                    <Motion defaultStyle={allEdges.reduce((p, edge) => ({
+                        [compKey(edge,"fromX")]: scaleX(edge.from.x) / width,
+                        [compKey(edge,"fromY")]: 1 - scaleY(edge.from.y) / height,
+                        [compKey(edge,"toX")]: scaleX(nodeDict[edge.linkTo].x) / width,
+                        [compKey(edge,"toY")]: 1 - scaleY(nodeDict[edge.linkTo].y) / height,
                         ...p
                     }), {})}
-                        style={allLinks.reduce((p, link) => ({
-                            [link.from.id + "-" + link.linkTo + "-fromX"]: spring(scaleX(link.from.x) / width),
-                            [link.from.id + "-" + link.linkTo + "-fromY"]: spring(1 - scaleY(link.from.y) / height),
-                            [link.from.id + "-" + link.linkTo + "-toX"]: spring(scaleX(nodeDict[link.linkTo].x) / width),
-                            [link.from.id + "-" + link.linkTo + "-toY"]: spring(1 - scaleY(nodeDict[link.linkTo].y) / height),
+                        style={allEdges.reduce((p, edge) => ({
+                            [compKey(edge,"fromX")]: spring(scaleX(edge.from.x) / width),
+                            [compKey(edge,"fromY")]: spring(1 - scaleY(edge.from.y) / height),
+                            [compKey(edge,"toX")]: spring(scaleX(nodeDict[edge.linkTo].x) / width),
+                            [compKey(edge,"toY")]: spring(1 - scaleY(nodeDict[edge.linkTo].y) / height),
                             ...p
                         }), {})}
                     >
                         {
-                            (style) => <Flow key="particles"
+                            (style) => <ParticleCanvas key="particles"
                                 width={diagramWidth}
                                 height={diagramHeight}
                                 run={run}
                                 backgroundColor={backgroundColor}>
                                 {
-                                    allLinks.map(link =>
-                                        <Step key={link.from.id + "-" + link.linkTo}
-                                            fromX={style[link.from.id + "-" + link.linkTo + "-fromX"]}
-                                            fromY={style[link.from.id + "-" + link.linkTo + "-fromY"]}
-                                            toX={style[link.from.id + "-" + link.linkTo + "-toX"]}
-                                            toY={style[link.from.id + "-" + link.linkTo + "-toY"]}
-                                            ratePerSecond={link.ratePerSecond}
-                                            {...link} />
+                                    allEdges.map(edge =>
+                                        <ParticleEdge key={edge.from.id + "-" + edge.linkTo}
+                                            fromX={style[compKey(edge,"fromX")]}
+                                            fromY={style[compKey(edge,"fromY")]}
+                                            toX={style[compKey(edge,"toX")]}
+                                            toY={style[compKey(edge,"toY")]}
+                                            ratePerSecond={edge.ratePerSecond}
+                                            {...edge} />
                                     )
                                 }
-                            </Flow>
+                            </ParticleCanvas>
                         }
                     </Motion>
                 </div>
