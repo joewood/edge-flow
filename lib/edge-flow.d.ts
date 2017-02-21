@@ -1,7 +1,8 @@
 /// <reference types="react" />
 import * as React from "react";
-import { Node } from "./model";
-export { Node, Edge, INode, IEdge, IEdgeProps, INodeProps } from "./flow-node";
+import { Node } from "./edge-flow-node";
+export { Edge, IEdgeProps } from "./edge-flow-edge";
+export { Node, INodeProps } from "./edge-flow-node";
 export interface NodeClickEventArgs {
     nodeId: string;
     graph: {
@@ -15,7 +16,7 @@ export interface NodeClickEventArgs {
 }
 export interface IProps {
     run?: boolean;
-    style?: {
+    style: {
         width: number;
         height: number;
         backgroundColor?: string;
@@ -27,8 +28,6 @@ export interface IProps {
 export interface IState {
 }
 export declare class EdgeFlow extends React.Component<IProps, IState> {
-    private rootDiv;
     constructor(p: IProps);
-    private onResize;
     render(): JSX.Element;
 }

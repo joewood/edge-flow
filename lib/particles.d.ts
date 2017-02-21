@@ -1,5 +1,5 @@
-import { IEdge as IModelEdge } from "./flow-node";
-export interface IFlow extends IModelEdge {
+import { IEdge as IModelEdge } from "./model";
+export interface IParticleEdge extends IModelEdge {
     fromX: number;
     fromY: number;
     toX: number;
@@ -28,7 +28,7 @@ export default class Particles {
     constructor(canvas: HTMLCanvasElement, size?: number);
     readonly isRunning: boolean;
     /** If the vertices have changed then update the buffers   */
-    updateBuffers(edges: IFlow[], width: number, height: number): void;
+    updateBuffers(edges: IParticleEdge[], width: number, height: number): void;
     /** Draw the current simulation state to the display. */
     draw(): this;
     /** Register with requestAnimationFrame to step and draw a frame.*/
