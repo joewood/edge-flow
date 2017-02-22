@@ -4,16 +4,15 @@
 
 import * as React from "react";
 import { maxBy, minBy, flatten, values, keyBy, Dictionary } from "lodash";
-import { WrappedSvgText } from "./svg-components"
-import Color = require("color");
 import { Motion, spring as _Spring } from "react-motion";
+import Color = require("color");
 
-import { ParticleCanvas, ParticleEdge } from "./particle-canvas";
-import { Edge, IEdgeProps } from "./edge-flow-edge";
-import { Node, INodeProps } from "./edge-flow-node";
+import { WrappedSvgText } from "./edge-flow/svg-components"
+import { ParticleCanvas, ParticleEdge } from "./edge-flow/particle-canvas";
+import { Edge, IEdgeProps } from "./edge-flow/edge-flow-edge";
+import { Node, INodeProps } from "./edge-flow/edge-flow-node";
 
-export { Edge, IEdgeProps } from "./edge-flow-edge"
-export { Node, INodeProps } from "./edge-flow-node";
+export { Edge, IEdgeProps, Node, INodeProps };
 
 const spring = _Spring; //(v: number) => oldSpring(v, { damping: 10, stiffness: 80 });
 

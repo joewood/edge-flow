@@ -1,8 +1,8 @@
 /// <reference types="react" />
 import * as React from "react";
-import { Node } from "./edge-flow-node";
-export { Edge, IEdgeProps } from "./edge-flow-edge";
-export { Node, INodeProps } from "./edge-flow-node";
+import { Edge, IEdgeProps } from "./edge-flow/edge-flow-edge";
+import { Node, INodeProps } from "./edge-flow/edge-flow-node";
+export { Edge, IEdgeProps, Node, INodeProps };
 export interface NodeClickEventArgs {
     nodeId: string;
     graph: {
