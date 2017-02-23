@@ -7,25 +7,24 @@ import { groupBy, maxBy, minBy, flatten, values, keyBy, Dictionary } from "lodas
 import Color = require("color");
 
 
-import { EdgeFlow, NodeClickEventArgs, IBaseProps } from "./edge-flow"
-import { Edge, IEdgeProps } from "./edge-flow-force/force-edge";
-import { Node, INodeProps } from "./edge-flow-force/force-node";
+import { EdgeFlow, Edge, Node, NodeClickEventArgs, IBaseProps } from "./edge-flow"
+import { Edge as EdgeForce, IEdgeForceProps } from "./edge-flow-force/force-edge";
+import { Node as NodeForce, INodeForceProps } from "./edge-flow-force/force-node";
 
-export { Edge, IEdgeProps, Node, INodeProps };
+export { EdgeForce, IEdgeForceProps, NodeForce, INodeForceProps };
 
 import {
     getPosition, getGraphFromNodes, getLayout, mapNodes,
-    mapLinks, IPosLink, IPosNode, IPos
+    mapLinks, IPosNode
 } from "./edge-flow-force/ngraph-helper"
 
 
 export interface IProps extends IBaseProps {
-    children?: Node[];
+    children?: NodeForce[];
 }
 
 export interface IState {
     nodes?: IPosNode[];
-    links?: IPosLink[];
 }
 
 const styles = {
@@ -47,38 +46,38 @@ export class EdgeFlowForce extends React.Component<IProps, IState> {
 
     constructor(p: IProps) {
         super(p);
-        this.state = { ...this.getStateFromProps(p) };
+        this.state = { nodes:this.getStateFromProps(p) };
     }
 
-    private getStateFromProps(newProps: IProps): IState {
+    private getStateFromProps(newProps: IProps): IPosNode[] {
         const graph = getGraphFromNodes(newProps.children as any);
         return getLayout(graph, newProps.children as any, newProps.style.width, newProps.style.height);
     }
 
     private componentWillReceiveProps(newProps: IProps) {
-        this.setState(this.getStateFromProps(newProps));
+        this.setState({nodes:this.getStateFromProps(newProps)});
     }
 
     public render() {
         const state = this.state;
         const posNodes = keyBy(state.nodes, n => n.id);
-
+        console.log("posNodes",posNodes);
         const {children, ...props} = this.props;
-        const nodes = getChildrenProps<INodeProps>(children) || [];
+        const nodes = getChildrenProps<INodeForceProps>(children) || [];
         const nodeDict = keyBy(nodes, n => n.id);
-        type EdgeAndNodeType = IEdgeProps & { from: INodeProps };
-        const allEdges = nodes.reduce((p, node: INodeProps) => [
+        type EdgeAndNodeType = IEdgeForceProps & { fromForceNode: string };
+        const allEdges = nodes.reduce((p, node) => [
             ...p,
-            ...(getChildrenProps<IEdgeProps>(node.children) || [])
+            ...(getChildrenProps<IEdgeForceProps>(node.children))
                 .filter(edge => !isNaN(edge.ratePerSecond) && (edge.ratePerSecond > 0))
-                .map(l => ({ from: node, ...l } as EdgeAndNodeType))
+                .map(edge => ({ fromForceNode: node.id, ...edge } as EdgeAndNodeType))
         ], [] as EdgeAndNodeType[]);
-        const groupedEdges = groupBy(allEdges, e => e.from.id);
-
+        const groupedEdges = groupBy(allEdges, e => e.fromForceNode);
+        console.log("allEdges",groupedEdges);
         return (<EdgeFlow {...props}>
             {
-                nodes.map(n => <Node key={n.id} x={posNodes[n.id].x} y={posNodes[n.id].y} {...n} >
-                    {groupedEdges[n.id].map(e => <Edge key={e.from.id + "-" + e.linkTo} {...e} />)}
+                nodes.map(node => <Node key={node.id} x={posNodes[node.id].x} y={posNodes[node.id].y} {...node} >
+                    {groupedEdges[node.id] && groupedEdges[node.id].map(edge => <Edge key={edge.fromForceNode + "-" + edge.linkTo} {...edge} />)}
                 </Node>)
             }
         </EdgeFlow>

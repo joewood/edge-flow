@@ -14,7 +14,7 @@ export interface NodeClickEventArgs {
         y: number;
     };
 }
-export interface IProps {
+export interface IBaseProps {
     run?: boolean;
     style: {
         width: number;
@@ -23,6 +23,8 @@ export interface IProps {
     };
     onClickNode?: (args: NodeClickEventArgs) => void;
     selectedNodeId?: string;
+}
+export interface IProps extends IBaseProps {
     children?: Node[];
 }
 export interface IState {

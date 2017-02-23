@@ -3,32 +3,31 @@ const graph = require("ngraph.graph");
 const layout = require('ngraph.forcelayout');
 import { keyBy } from "lodash";
 
-import { Edge, IEdgeProps } from "./force-edge";
-import { Node, INodeProps } from "./force-node";
+import { Edge, IEdgeForceProps } from "./force-edge";
+import { Node, INodeForceProps } from "./force-node";
 
-export interface IPos {
+export interface IPosNode {
     x: number;
     y: number;
     id: string;
-    to?: string;
-    original?: {
-        x: number;
-        y: number;
-    }
+    // to?: string;
+    // original?: {
+    //     x: number;
+    //     y: number;
+    // }
 }
 
-export type IPosLink = IPos & { node: IPosNode; to: string, ratePerSecond: number };
-export type IPosNode = IPos & { text: string, links: IPosLink[], group?: boolean };
+// export type IPosLink = IPos & { node: IPosNode; to: string };
 
-type NodeProps = INodeProps & { links: IEdgeProps[] };
+type NodeProps = INodeForceProps & { links: IEdgeForceProps[] };
 
-export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeProps>[]): any {
+export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeForceProps>[]): any {
     let g = graph();
-    const nodes: NodeProps[] = eachChild<INodeProps, any>(childrenNodes,
+    const nodes: NodeProps[] = eachChild<INodeForceProps, any>(childrenNodes,
         props => ({
             ...props,
             text: props.label,
-            links: eachChild<IEdgeProps, IEdgeProps>(props.children, cc => cc)
+            links: eachChild<IEdgeForceProps, IEdgeForceProps>(props.children, cc => cc)
         }) as NodeProps);
     const nodeDict = keyBy(nodes, n => n.id);
     for (let node of nodes) {
@@ -36,7 +35,7 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeProps>[
         if (node.links) {
             for (let link of node.links) {
                 if (!nodeDict[link.linkTo]) continue;
-                g.addLink(node.id, link.linkTo, { ratePerSecond: link.ratePerSecond });
+                g.addLink(node.id, link.linkTo);//, { ratePerSecond: link.ratePerSecond });
             }
         }
     }
@@ -44,14 +43,15 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeProps>[
 }
 
 function eachChild<T, X>(children, f: (child: T) => X) {
-    const nonNull = React.Children.map(children, (c: any) => c).filter(c => !!c).map(c => c.props as T);
+    const childNodes= React.Children.map(children, (c: any) => c)||[];
+    const nonNull = childNodes.filter(c => !!c).map(c => c.props as T);
     return nonNull.map(f);
 }
 
-export function getLayout(g: any, childrenNodes: React.ReactElement<INodeProps>[], width: number, height: number)
-    : { nodes: IPosNode[], links: IPosLink[] } {
+export function getLayout(g: any, childrenNodes: React.ReactElement<INodeForceProps>[], width: number, height: number)
+    : IPosNode[] {
     const forceLayout = layout(g);
-    eachChild<INodeProps, any>(childrenNodes, nodeProp => {
+    eachChild<INodeForceProps, any>(childrenNodes, nodeProp => {
         if (!isNaN(nodeProp.x) && !isNaN(nodeProp.y)) {
             forceLayout.setNodePosition(nodeProp.id, nodeProp.x, nodeProp.y);
             if (nodeProp.fixed) {
@@ -63,7 +63,7 @@ export function getLayout(g: any, childrenNodes: React.ReactElement<INodeProps>[
             console.log("Changing Mass");
             forceLayout.getBody(nodeProp.id).mass = nodeProp.mass;
         }
-        eachChild<IEdgeProps, any>(nodeProp.children, linkProp => {
+        eachChild<IEdgeForceProps, any>(nodeProp.children, linkProp => {
             if (!isNaN(linkProp.length) || nodeProp.group) {
                 const spring = forceLayout.getSpring(nodeProp.id, linkProp.linkTo);
                 if (spring) spring.length = linkProp.length || 6;
@@ -87,21 +87,8 @@ export function getLayout(g: any, childrenNodes: React.ReactElement<INodeProps>[
         });
     }
     const rect = forceLayout.getGraphRect();
-
-    const newNodes = mapNodes(g).map<IPosNode>(node => ({
-        ...getPosition(forceLayout, node, rect, 20, width, height),
-        text: node.data.text,
-        group: node.data.group,
-        links: []
-    }));
-    const newLinks = mapLinks(g).map<IPosLink>(l => ({
-        ...getPosition(forceLayout, g.getNode(l.toId), rect, 20, width, height, true),
-        to: l.toId,
-        id: l.fromId,
-        node: getPosition(forceLayout, g.getNode(l.fromId), rect, 20, width, height, true),
-        ratePerSecond: l.data.ratePerSecond
-    }) as IPosLink);
-    return { nodes: newNodes, links: newLinks };
+    const newNodes = mapNodes(g).map<IPosNode>(node => getPosition(forceLayout, node, rect, 20, width, height));
+    return newNodes;
 }
 
 export function mapLinks(graph: any, node?: any): any[] {
@@ -126,7 +113,7 @@ export function mapNodes(graph: any): any[] {
     return nn;
 }
 
-export function getPosition(layout: any, n: any, rect: any, blockWidth: number, screenWidth: number, screenHeight: number, center: boolean = false): IPos {
+export function getPosition(layout: any, n: any, rect: any, blockWidth: number, screenWidth: number, screenHeight: number, center: boolean = false): IPosNode {
     // total width if the graph size + the block size + margin *2
     if (!n) {
         console.error("Invalid Node");
@@ -143,9 +130,5 @@ export function getPosition(layout: any, n: any, rect: any, blockWidth: number, 
         id: n.id,
         x: (pos.x + offsetX) * scaleX - (center ? 0 : blockWidth * 0.5),
         y: (pos.y + offsetY) * scaleY - (center ? 0 : blockWidth * 0.5),
-        original: {
-            x: pos.x,
-            y: pos.y
-        }
     };
 }

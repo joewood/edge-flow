@@ -30,10 +30,10 @@ export default class Partition extends React.Component<IProps, IState> {
             style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black", height: height || 200, width: width || 200, overflow: "hidden" }}>
             <EdgeFlowForce style={{ height: (height || 200) * 0.9, width: (width || 200) * 0.9, backgroundColor: "black" }} run={animate} >
                 <NodeForce key="source" id="source" >
-                    <EdgeForce key="1" linkTo="connector"  ratePerSecond={20} />
+                    <EdgeForce key="12E" linkTo="connector"  ratePerSecond={20} />
                 </NodeForce>
                 <NodeForce key="connector" id="connector" >
-                    <EdgeForce key="1" linkTo="target" ratePerSecond={20}/>
+                    <EdgeForce key="21E" linkTo="target" ratePerSecond={20}/>
                 </NodeForce>
                 <NodeForce key="target" id="target" >
                 </NodeForce>

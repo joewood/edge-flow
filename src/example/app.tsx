@@ -23,7 +23,7 @@ class App extends React.Component<any, IState> {
     constructor(p: any) {
         super(p);
         this.state = {
-            screen: Screen.PARTITION,
+            screen: Screen.NETWORK,
             height: 300,
             width: 300,
             animate: false,
