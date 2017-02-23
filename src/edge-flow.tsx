@@ -22,8 +22,8 @@ export interface NodeClickEventArgs {
     screen: { x: number, y: number };
 }
 
-export interface IProps {
-    // text?: string;
+// define a base set of props, as Component can reuse without children dependency
+export interface IBaseProps {
     run?: boolean;
     style: {
         width: number;
@@ -32,6 +32,9 @@ export interface IProps {
     }
     onClickNode?: (args: NodeClickEventArgs) => void;
     selectedNodeId?: string;
+}
+
+export interface IProps extends IBaseProps {
     children?: Node[];
 }
 
@@ -82,8 +85,8 @@ export class EdgeFlow extends React.Component<IProps, IState> {
             ...style
         };
         if (nodes.length === 0) return <div />;
-        const max = { x: maxBy(nodes, n => n.x).x*1.1, y: maxBy(nodes, n => n.y).y*1.1 };
-        const min = { x: minBy(nodes, n => n.x).x*0.9, y: minBy(nodes, n => n.y).y*0.9 };
+        const max = { x: maxBy(nodes, n => n.x).x * 1.1, y: maxBy(nodes, n => n.y).y * 1.1 };
+        const min = { x: minBy(nodes, n => n.x).x * 0.9, y: minBy(nodes, n => n.y).y * 0.9 };
 
         const scaleX = (x: number) => ((x - min.x) + (max.x - min.x) * 0.08) / ((max.x - min.x) * 1.16) * diagramWidth;
         const scaleY = (y: number) => ((y - min.y) + (max.y - min.y) * 0.08) / ((max.y - min.y) * 1.16) * diagramHeight;
@@ -103,15 +106,15 @@ export class EdgeFlow extends React.Component<IProps, IState> {
             throw ("MIssing Target");
         }
 
-        const compKey = (edge:EdgeAndNodeType,suffix:"fromX"|"fromY"|"toX"|"toY") =>edge.from.id + "-" + edge.linkTo + "-" + suffix;
+        const compKey = (edge: EdgeAndNodeType, suffix: "fromX" | "fromY" | "toX" | "toY") => edge.from.id + "-" + edge.linkTo + "-" + suffix;
 
         const svgLineFn = style =>
             <g>{
                 allEdges.map(edge => {
-                    const styleX = style[compKey(edge,"fromX")];
-                    const styleY = style[compKey(edge,"fromY")];
-                    const styletoX = style[compKey(edge,"toX")];
-                    const styletoY = style[compKey(edge,"toY")];
+                    const styleX = style[compKey(edge, "fromX")];
+                    const styleY = style[compKey(edge, "fromY")];
+                    const styletoX = style[compKey(edge, "toX")];
+                    const styletoY = style[compKey(edge, "toY")];
                     if (!styleX || !styleY || !styletoX || !styletoY) throw "Invalid Style";
                     return <path key={edge.from.id + "-" + edge.linkTo}
                         d={`M${styleX} ${styleY} L${styletoX} ${styletoY}`}
@@ -128,17 +131,17 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                 <svg width={width} height={height} style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
                     onClick={() => onClickNode({ nodeId: null, graph: null, screen: null })}>
                     <Motion defaultStyle={allEdges.reduce((p, edge) => ({
-                        [compKey(edge,"fromX")]: scaleX(edge.from.x),
-                        [compKey(edge,"fromY")]: scaleY(edge.from.y),
-                        [compKey(edge,"toX")]: scaleX(nodeDict[edge.linkTo].x),
-                        [compKey(edge,"toY")]: scaleY(nodeDict[edge.linkTo].y),
+                        [compKey(edge, "fromX")]: scaleX(edge.from.x),
+                        [compKey(edge, "fromY")]: scaleY(edge.from.y),
+                        [compKey(edge, "toX")]: scaleX(nodeDict[edge.linkTo].x),
+                        [compKey(edge, "toY")]: scaleY(nodeDict[edge.linkTo].y),
                         ...p
                     }), {})}
                         style={allEdges.reduce((p, edge) => ({
-                            [compKey(edge,"fromX")]: spring(scaleX(edge.from.x)),
-                            [compKey(edge,"fromY")]: spring(scaleY(edge.from.y)),
-                            [compKey(edge,"toX")]: spring(scaleX(nodeDict[edge.linkTo].x)),
-                            [compKey(edge,"toY")]: spring(scaleY(nodeDict[edge.linkTo].y)),
+                            [compKey(edge, "fromX")]: spring(scaleX(edge.from.x)),
+                            [compKey(edge, "fromY")]: spring(scaleY(edge.from.y)),
+                            [compKey(edge, "toX")]: spring(scaleX(nodeDict[edge.linkTo].x)),
+                            [compKey(edge, "toY")]: spring(scaleY(nodeDict[edge.linkTo].y)),
                             ...p
                         }), {})}>{svgLineFn}
                     </Motion>
@@ -197,17 +200,17 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                 <div key="particleContainer"
                     style={{ pointerEvents: "none", position: "absolute", left: 0, top: 0 }}>
                     <Motion defaultStyle={allEdges.reduce((p, edge) => ({
-                        [compKey(edge,"fromX")]: scaleX(edge.from.x) / width,
-                        [compKey(edge,"fromY")]: 1 - scaleY(edge.from.y) / height,
-                        [compKey(edge,"toX")]: scaleX(nodeDict[edge.linkTo].x) / width,
-                        [compKey(edge,"toY")]: 1 - scaleY(nodeDict[edge.linkTo].y) / height,
+                        [compKey(edge, "fromX")]: scaleX(edge.from.x) / width,
+                        [compKey(edge, "fromY")]: 1 - scaleY(edge.from.y) / height,
+                        [compKey(edge, "toX")]: scaleX(nodeDict[edge.linkTo].x) / width,
+                        [compKey(edge, "toY")]: 1 - scaleY(nodeDict[edge.linkTo].y) / height,
                         ...p
                     }), {})}
                         style={allEdges.reduce((p, edge) => ({
-                            [compKey(edge,"fromX")]: spring(scaleX(edge.from.x) / width),
-                            [compKey(edge,"fromY")]: spring(1 - scaleY(edge.from.y) / height),
-                            [compKey(edge,"toX")]: spring(scaleX(nodeDict[edge.linkTo].x) / width),
-                            [compKey(edge,"toY")]: spring(1 - scaleY(nodeDict[edge.linkTo].y) / height),
+                            [compKey(edge, "fromX")]: spring(scaleX(edge.from.x) / width),
+                            [compKey(edge, "fromY")]: spring(1 - scaleY(edge.from.y) / height),
+                            [compKey(edge, "toX")]: spring(scaleX(nodeDict[edge.linkTo].x) / width),
+                            [compKey(edge, "toY")]: spring(1 - scaleY(nodeDict[edge.linkTo].y) / height),
                             ...p
                         }), {})}
                     >
@@ -220,10 +223,10 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                 {
                                     allEdges.map(edge =>
                                         <ParticleEdge key={edge.from.id + "-" + edge.linkTo}
-                                            fromX={style[compKey(edge,"fromX")]}
-                                            fromY={style[compKey(edge,"fromY")]}
-                                            toX={style[compKey(edge,"toX")]}
-                                            toY={style[compKey(edge,"toY")]}
+                                            fromX={style[compKey(edge, "fromX")]}
+                                            fromY={style[compKey(edge, "fromY")]}
+                                            toX={style[compKey(edge, "toX")]}
+                                            toY={style[compKey(edge, "toY")]}
                                             ratePerSecond={edge.ratePerSecond}
                                             {...edge} />
                                     )

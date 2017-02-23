@@ -1,6 +1,6 @@
 {
   "name": "edge-flow",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "React Component using Particle System to animate data-flow",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -34,7 +34,7 @@
     "@types/react-motion": "^0.0.21",
     "@types/webpack": "^2.2.2",
     "ts-loader": "^2.0.0",
-    "typescript": "^2.1.6"
+    "typescript": "^2.2.0"
   },
   "peerDependencies": {
     "react": "^15.4.2",
@@ -44,7 +44,6 @@
     "color": "^1.0.3",
     "igloo-ts": "^1.0.0",
     "lodash": "^4.17.4",
-    "react-motion": "^0.4.7",
-    "seedrandom": "^2.4.2"
+    "react-motion": "^0.4.7"
   }
 }

@@ -3,8 +3,9 @@ import * as ReactDOM from 'react-dom'
 import { range } from "lodash";
 import Swirl from "./swirl";
 import Partition from "./partition"
+import Network from "./network"
 
-enum Screen { SWIRL, SIMPLE, PARTITION };
+enum Screen { SWIRL, SIMPLE, PARTITION, NETWORK };
 
 interface IState {
     screen: Screen;
@@ -65,11 +66,14 @@ class App extends React.Component<any, IState> {
                 <button key="swirl" style={buttonStyle}
                     onClick={() => this.setState({ screen: Screen.SWIRL })}>Swirl</button>
                 <button key="partition" style={buttonStyle}
-                       onClick={() => this.setState({ screen: Screen.PARTITION })}>Partition</button>
+                    onClick={() => this.setState({ screen: Screen.PARTITION })}>Partition</button>
+                <button key="network" style={buttonStyle}
+                    onClick={() => this.setState({ screen: Screen.NETWORK })}>Network</button>
             </div>
             {screen == Screen.SWIRL ?
-                <Swirl animate={animate} animationIndex={animationIndex} height={height-60} width={width} />
-                : <Partition animate={animate} animationIndex={animationIndex} height={height-60} width={width} />
+                <Swirl animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
+                : (screen == Screen.PARTITION) ? <Partition animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
+                    : <Network animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
             }
         </div>
         )

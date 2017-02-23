@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export interface INode {
+export interface IPositionlessNode {
     symbol?: string;
     symbolColor?:string;
     symbolSize?:number;
@@ -8,10 +8,13 @@ export interface INode {
     label?:string;
     labelColor?:string;
     id: string;
-    x: number;
-    y: number;
     annotation?:boolean;
     group?: boolean;
+}
+
+export interface INode extends IPositionlessNode {
+    x: number;
+    y: number;
 }
 
 export interface IEdge {
