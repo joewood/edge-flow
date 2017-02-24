@@ -4,6 +4,7 @@ import { range } from "lodash";
 import Swirl from "./swirl";
 import Partition from "./partition"
 import Network from "./network"
+import "font-awesome/css/font-awesome.css"
 
 enum Screen { SWIRL, SIMPLE, PARTITION, NETWORK };
 
@@ -30,7 +31,7 @@ class App extends React.Component<any, IState> {
             animationIndex: 0
         }
     }
-
+ 
     private onResize = () => {
         console.log("resize");
         this.setState({ width: document.getElementById("root").clientWidth, height: document.getElementById("root").clientHeight });
@@ -81,6 +82,5 @@ class App extends React.Component<any, IState> {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    console.log("ready");
     ReactDOM.render(<App />, document.getElementById("root"));
 });
