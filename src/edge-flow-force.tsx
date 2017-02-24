@@ -61,7 +61,6 @@ export class EdgeFlowForce extends React.Component<IProps, IState> {
     public render() {
         const state = this.state;
         const posNodes = keyBy(state.nodes, n => n.id);
-        console.log("posNodes",posNodes);
         const {children, ...props} = this.props;
         const nodes = getChildrenProps<INodeForceProps>(children) || [];
         const nodeDict = keyBy(nodes, n => n.id);
@@ -73,7 +72,6 @@ export class EdgeFlowForce extends React.Component<IProps, IState> {
                 .map(edge => ({ fromForceNode: node.id, ...edge } as EdgeAndNodeType))
         ], [] as EdgeAndNodeType[]);
         const groupedEdges = groupBy(allEdges, e => e.fromForceNode);
-        console.log("allEdges",groupedEdges);
         return (<EdgeFlow {...props}>
             {
                 nodes.map(node => <Node key={node.id} x={posNodes[node.id].x} y={posNodes[node.id].y} {...node} >

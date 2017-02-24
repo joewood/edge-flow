@@ -86,9 +86,8 @@ export function getLayout(g: any, childrenNodes: React.ReactElement<INodeForcePr
             forceLayout.setNodePosition(locked.id, lockToPos.x, lockToPos.y);
         });
     }
-    const rect = forceLayout.getGraphRect();
-    const newNodes = mapNodes(g).map<IPosNode>(node => getPosition(forceLayout, node, rect, 20, width, height));
-    return newNodes;
+    // const rect = forceLayout.getGraphRect();
+    return mapNodes(g).map<IPosNode>(node => getPosition(forceLayout, node/*, rect, 20, width, height*/));
 }
 
 export function mapLinks(graph: any, node?: any): any[] {
@@ -113,22 +112,23 @@ export function mapNodes(graph: any): any[] {
     return nn;
 }
 
-export function getPosition(layout: any, n: any, rect: any, blockWidth: number, screenWidth: number, screenHeight: number, center: boolean = false): IPosNode {
+export function getPosition(layout: any, n: any/*, rect: any, blockWidth: number, screenWidth: number, screenHeight: number, center: boolean = false*/): IPosNode {
     // total width if the graph size + the block size + margin *2
-    if (!n) {
-        console.error("Invalid Node");
-        return { x: 0, y: 0, id: null };
-    }
-    const width = rect.x2 - rect.x1 + blockWidth;
-    const height = rect.y2 - rect.y1 + blockWidth;
-    const scaleX = screenWidth / width;
-    const scaleY = screenHeight / height;
-    const offsetX = rect.x1 * -1 + blockWidth * 0.5;
-    const offsetY = rect.y1 * -1 + blockWidth * 0.5;
-    const pos = layout.getNodePosition(n.id);
-    return {
-        id: n.id,
-        x: (pos.x + offsetX) * scaleX - (center ? 0 : blockWidth * 0.5),
-        y: (pos.y + offsetY) * scaleY - (center ? 0 : blockWidth * 0.5),
-    };
+    // if (!n) {
+    //     console.error("Invalid Node");
+    //     return { x: 0, y: 0, id: null };
+    // }
+    // const width = rect.x2 - rect.x1 + blockWidth;
+    // const height = rect.y2 - rect.y1 + blockWidth;
+    // const scaleX = screenWidth / width;
+    // const scaleY = screenHeight / height;
+    // const offsetX = rect.x1 * -1 + blockWidth * 0.5;
+    // const offsetY = rect.y1 * -1 + blockWidth * 0.5;
+    // const pos = 
+    return {id:n.id,...layout.getNodePosition(n.id)};
+    // return {
+    //     id: n.id,
+    //     x: (pos.x + offsetX) * scaleX - (center ? 0 : blockWidth * 0.5),
+    //     y: (pos.y + offsetY) * scaleY - (center ? 0 : blockWidth * 0.5),
+    // };
 }

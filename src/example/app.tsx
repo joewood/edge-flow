@@ -56,7 +56,6 @@ class App extends React.Component<any, IState> {
 
     public render() {
         const {screen, width, height, animate, animationIndex} = this.state;
-        console.log(`${width} ${height}`);
         const buttonStyle = { height: 50, width: 130, margin: 5, color: "black" };
         return (<div key="root" id="root"
             style={{ backgroundColor: "green", overflow: "hidden" }}
