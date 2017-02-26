@@ -10,11 +10,6 @@ export interface IPosNode {
     x: number;
     y: number;
     id: string;
-    // to?: string;
-    // original?: {
-    //     x: number;
-    //     y: number;
-    // }
 }
 
 // export type IPosLink = IPos & { node: IPosNode; to: string };
