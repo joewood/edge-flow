@@ -27,11 +27,11 @@ export default class Partition extends React.Component<IProps, IState> {
         const { animate, animationIndex, width, height} = this.props;
         const inc = 1, x = 10, y = 10;
         return <div key="root"
-            style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black", height: height || 200, width: width || 200, overflow: "hidden" }}>
-            <EdgeFlowDag style={{ height: (height || 200) * 0.9, width: (width || 200) * 0.9, backgroundColor: "black" }} run={animate} >
+            style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "#303080", height: height || 200, width: width || 200, overflow: "hidden" }}>
+            <EdgeFlowDag style={{ height: (height || 200) * 0.9, width: (width || 200) * 0.9, backgroundColor: "#303080" }} run={animate} >
 
                 <NodeDag key="source" id="source" symbol={"\uf109"} label="Source" symbolColor="white" symbolSize={50} >
-                    <EdgeDag key="11E" linkTo="connector1" ratePerSecond={20} variationMax={0.02} variationMin={-0.02} size={20} shape={1} color="blue" endingColor="green" />
+                    <EdgeDag key="11E" linkTo="connector1" ratePerSecond={20} variationMax={0.02} variationMin={-0.02} size={20} shape={1} color="blue" endingColor="green"  />
                     <EdgeDag key="12E" linkTo="connector2" ratePerSecond={20} variationMax={0.02} variationMin={-0.02} size={20} shape={1} color="blue" endingColor="green" />
                     <EdgeDag key="13E" linkTo="connector3" ratePerSecond={20} variationMax={0.02} variationMin={-0.02} size={20} shape={1} color="blue" endingColor="green" />
                 </NodeDag>

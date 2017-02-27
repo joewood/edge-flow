@@ -113,11 +113,15 @@ export class EdgeFlow extends React.Component<IProps, IState> {
             allEdges.map(edge => {
                 const styleX = style[compKey(edge, "from") + "X"];
                 const styleY = style[compKey(edge, "from") + "Y"];
+                const styleP2X = style[compKey(edge, "p2") + "X"];
+                const styleP2Y = style[compKey(edge, "p2") + "Y"];
+                const styleP3X = style[compKey(edge, "p3") + "X"];
+                const styleP3Y = style[compKey(edge, "p3") + "Y"];
                 const styletoX = style[compKey(edge, "to") + "X"];
                 const styletoY = style[compKey(edge, "to") + "Y"];
                 if (!styleX || !styleY || !styletoX || !styletoY) throw "Invalid Style";
                 return <path key={edge.from.id + "-" + edge.linkTo}
-                    d={`M${styleX * diagramWidth} ${styleY * diagramHeight} L${styletoX * diagramWidth} ${styletoY * diagramHeight}`}
+                    d={`M${styleX * diagramWidth} ${styleY * diagramHeight} C ${styleP2X * diagramWidth} ${styleP2Y * diagramHeight} ${styleP3X * diagramWidth} ${styleP3Y * diagramHeight} ${styletoX * diagramWidth} ${styletoY * diagramHeight}`}
                     stroke={edge.pathColor || defaulltStrokeColor}
                     opacity={edge.pathOpacity || 0.1}
                     fill="transparent"
