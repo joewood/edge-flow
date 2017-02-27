@@ -63,6 +63,8 @@ export class EdgeFlowDag extends React.Component<IProps, IState> {
         const {children, ...props} = this.props;
         const nodes = getChildrenProps<INodeDagProps>(children) || [];
         const nodeDict = keyBy(nodes, n => n.id);
+        const posEdges = flatten(state.nodes.map(n => n.edges.map(e => ({ ...e, id: n.id  }))));
+        const edgeDict = keyBy(posEdges, e => e.id + "-" + e.linkTo)
         type EdgeAndNodeType = IEdgeDagProps & { fromForceNode: string };
         const allEdges = nodes.reduce((p, node) => [
             ...p,
@@ -74,7 +76,16 @@ export class EdgeFlowDag extends React.Component<IProps, IState> {
         return (<EdgeFlow {...props}>
             {
                 nodes.map(node => <Node key={node.id} x={posNodes[node.id].x} y={posNodes[node.id].y} {...node} >
-                    {groupedEdges[node.id] && groupedEdges[node.id].map(edge => <Edge key={edge.fromForceNode + "-" + edge.linkTo} {...edge} />)}
+                    {groupedEdges[node.id] && groupedEdges[node.id].map(edge => {
+                        const ee = edgeDict[node.id + "-" + edge.linkTo];
+                        return <Edge key={edge.fromForceNode + "-" + edge.linkTo}
+                            {...edge}
+                            source={ee.p1}
+                            p2={ee.p2}
+                            p3={ee.p3}
+                            target={ee.p4}
+                        />;
+                    })}
                 </Node>)
             }
         </EdgeFlow>

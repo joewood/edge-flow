@@ -3,7 +3,7 @@ const vertexShader = require("../../loader/raw-loader!../shaders/vertex.glsl");
 const pixelShader = require("../../loader/raw-loader!../shaders/pixel.glsl");
 import Color = require("color");
 import TextureData from "./texture-data";
-import { IEdge as IModelEdge } from "./model"
+import { IEdge as IModelEdge, IPoint } from "./model"
 
 export interface IParticleEdge extends IModelEdge {
     fromX: number;
@@ -13,12 +13,13 @@ export interface IParticleEdge extends IModelEdge {
 }
 
 // texture buffer used to hold vertex information
-const colorRow = 0;
-const vertexRow = 1;
-const variationRow = 2;
-const shapeRow = 3;
-const endColorRow = 4;
-const edgeRows = 5;
+const COLOR_ROW = 0;
+const VERTEX_ROW = 1;
+const VARIATION_ROW = 2;
+const SHAPE_ROW = 3;
+const END_COLOR_ROW = 4;
+const BEZIER_ROW = 4;
+const edgeRows = 6;
 
 export default class Particles {
     private worldsize: Float32Array;
@@ -69,6 +70,10 @@ export default class Particles {
             const edgeCount = edges.length;
             this.worldsize = new Float32Array([width, height]);
 
+            const scale = { x: width, y: height };
+            const convertBezierPoints = (edgePoint: IPoint, defaultPoint: IPoint) =>
+                edgePoint ? { x: edgePoint.x, y: edgePoint.y } : { x: defaultPoint.x, y: defaultPoint.y };
+
             // if the total particle count has changed then we need to change the associations
             // between the particle and the vertex data (edge) 
             if (particleCount != this.count) {
@@ -107,25 +112,32 @@ export default class Particles {
                 const variationMin = (edge.variationMin === undefined) ? -0.01 : edge.variationMin;
                 const variationMax = (edge.variationMax === undefined) ? 0.01 : edge.variationMax;
                 // set-up vertices in edgedata
-                this.textureData.setValue(vertexRow, edgeIndex, edge.fromX, edge.fromY, edge.toX, edge.toY);
+                this.textureData.setVec2(VERTEX_ROW, edgeIndex,
+                    convertBezierPoints({ x: edge.fromX, y: edge.fromY }, { x: edge.fromX, y: edge.fromY }),
+                    convertBezierPoints({ x: edge.toX, y: edge.toY }, { x: edge.toX, y: edge.toY }));
                 // random variation of the particles
-                this.textureData.setValue(variationRow, edgeIndex, variationMin, variationMax, variationMax - variationMin, Math.random());
+                this.textureData.setValue(VARIATION_ROW, edgeIndex, variationMin, variationMax, variationMax - variationMin, Math.random());
                 // set-up color in edge Data
-                this.textureData.setColor(colorRow, edgeIndex, edge.color || this.color);
-                this.textureData.setColor(endColorRow, edgeIndex, edge.endingColor || edge.color || this.color);
+                this.textureData.setColor(COLOR_ROW, edgeIndex, edge.color || this.color);
+                this.textureData.setColor(END_COLOR_ROW, edgeIndex, edge.endingColor || edge.color || this.color);
                 // set-up shape
-                this.textureData.setValue(shapeRow, edgeIndex, (edge.size || this.size || 8.0) / 256, edge.shape || 0.0, 0.0, 0.0);
+                this.textureData.setValue(SHAPE_ROW, edgeIndex, (edge.size || this.size || 8.0) / 256, edge.shape || 0.0, 0.0, 0.0);
+                // bezier
+                this.textureData.setVec2(BEZIER_ROW, edgeIndex,
+                    convertBezierPoints(edge.p2, edge.p2),//{ x: edge.fromX, y: edge.fromY }),
+                    convertBezierPoints(edge.p3, edge.p3));//{ x: edge.toX, y: edge.toY }));
 
                 edgeIndex++;
             }
             this.program.use();
 
             this.program.uniform('edgeCount', this.textureData.lengthPower2);
-            this.program.uniform('variationRow', (variationRow + 0.5) / this.textureData.rowsPower2);
-            this.program.uniform('colorRow', (colorRow + 0.5) / this.textureData.rowsPower2);
-            this.program.uniform('vertexRow', (vertexRow + 0.5) / this.textureData.rowsPower2);
-            this.program.uniform('endColorRow', (endColorRow + 0.5) / this.textureData.rowsPower2);
-            this.program.uniform('shapeRow', (shapeRow + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('variationRow', (VARIATION_ROW + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('colorRow', (COLOR_ROW + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('vertexRow', (VERTEX_ROW + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('endColorRow', (END_COLOR_ROW + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('shapeRow', (SHAPE_ROW + 0.5) / this.textureData.rowsPower2);
+            this.program.uniform('bezierRow', (BEZIER_ROW + 0.5) / this.textureData.rowsPower2);
 
             const edgeTexture = this.textureData.bindTexture(this.igloo.gl, gl.TEXTURE0);
 

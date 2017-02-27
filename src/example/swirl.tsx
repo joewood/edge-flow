@@ -60,6 +60,10 @@ export default class Swirl extends React.Component<IProps, IState> {
                                 pathColor={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`} />
                             <Edge linkTo={"nodep-" + Math.floor(i / points.length * 4)} ratePerSecond={10} color="#e0ffe0" size={8}
                                 shape={1.0} pathWidth={3} pathOpacity={0.001} nonrandom
+                                source={{ x: p.x, y: p.y }}
+                                p2={{ x: p.x + 10.0, y: p.y + 10.0 }}
+                                p3={{ x: radius+40, y: radius+40 }}
+                                target={{ x:  radius, y: radius }}
                                 endingColor="rgba(192,255,192,0.0)"
                             />
                         </Node>),

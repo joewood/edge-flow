@@ -26,6 +26,18 @@ export default class TextureData {
         this.data[row * this.lengthPower2 * 4 + index * 4 + 3] = value4;
     }
 
+    /** Set the data in the texture
+     * @param vec1 must be (0->1.0,0->1.0)
+     * @param vec2 must be (0->1.0,0->1.0)
+     */
+    public setVec2(row: number, index: number, vec1:{x:number,y:number}, vec2: {x:number,y:number}): void {
+        this.data[row * this.lengthPower2 * 4 + index * 4 + 0] = vec1.x;
+        this.data[row * this.lengthPower2 * 4 + index * 4 + 1] = vec1.y;
+        this.data[row * this.lengthPower2 * 4 + index * 4 + 2] = vec2.x;
+        this.data[row * this.lengthPower2 * 4 + index * 4 + 3] = vec2.y;
+    }
+
+
     public setColor(row: number, index: number, color: string, alpha = 1.0): void {
         const colorObj = Color(color);
         const colorarray = colorObj.array();
