@@ -17,5 +17,3 @@ export interface IPosNode {
 }
 export declare function getGraphFromNodes(childrenNodes: React.ReactElement<INodeDagProps>[]): any;
 export declare function getLayout(g: any, childrenNodes: React.ReactElement<INodeDagProps>[], width: number, height: number): IPosNode[];
-export declare function mapLinks(graph: any, node?: any): any[];
-export declare function mapNodes(graph: any): any[];

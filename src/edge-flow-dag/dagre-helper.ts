@@ -35,8 +35,8 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeDagProp
         props => ({
             ...props,
             label: props.label,
-            width: 30,
-            height: 20,
+            width: 20,
+            height: 15,
             links: mapChild<IEdgeDagProps, IEdgeDagProps>(props.children, cc => cc)
         }) as NodeProps);
     const nodeDict = keyBy(nodes, n => n.id);
@@ -64,11 +64,14 @@ export function getLayout(
     width: number,
     height: number): IPosNode[] {
     g.rankdir = "LR";
-    const forceLayout = layout.layout(g, { rankdir: "LR" }); //,{ createSimulator: simulator});
+    const forceLayout = layout.layout(g, { rankdir: "LR" }); 
     const nodes: any[] = g.nodes();
     const posNodes = nodes.map(node => {
-        const pt = g.node(node) && g.node(node);
-        if (!pt) return null;
+        const pt = g.node(node);
+        if (!pt) {
+            console.error("Unknown Node ",node);
+            return null;
+        }
         return { id: node, x: pt.x, y: pt.y, edges: [] };
     }).filter(e => e);
     const posNodesDict = keyBy(posNodes, n => n.id);
@@ -79,33 +82,14 @@ export function getLayout(
             posNodesDict[edge.v].edges.push({
                 linkTo: edge.w,
                 p1: e.points[0],
-                p2: e.points[1] || e.points[1],
+                p2: e.points[1] || e.points[0],
                 p3: e.points[2] || e.points[1] || e.points[0],
                 p4: e.points.slice(-1)[0],
             });
+        } else {
+            console.error("edge in layout has missing source node",edge);
+            debugger;
         }
     }
     return posNodes;
-}
-
-export function mapLinks(graph: any, node?: any): any[] {
-    const nn: any[] = [];
-    if (node) {
-        graph.forEachLinkedNode(node.id, l => {
-            nn.push(l);
-        });
-    } else {
-        graph.forEachLink(l => {
-            nn.push(l);
-        });
-    }
-    return nn;
-}
-
-export function mapNodes(graph: any): any[] {
-    const nn: any[] = [];
-    graph.forEachNode(n => {
-        nn.push(n);
-    });
-    return nn;
 }

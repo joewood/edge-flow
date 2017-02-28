@@ -4,7 +4,7 @@
 
 import * as React from "react";
 import { maxBy, minBy, flatten, values, keyBy, Dictionary } from "lodash";
-import { Motion, spring as _Spring } from "react-motion";
+import { TransitionMotion, spring as _Spring } from "react-motion";
 import Color = require("color");
 
 import { WrappedSvgText } from "./edge-flow/svg-components"
@@ -15,6 +15,7 @@ import { IPoint } from "./edge-flow/model";
 
 export { Edge, IEdgeProps, Node, INodeProps };
 
+// const oldSpring = _Spring;
 const spring = _Spring; //(v: number) => oldSpring(v, { damping: 10, stiffness: 80 });
 
 export interface NodeClickEventArgs {
@@ -66,6 +67,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
 
     public render() {
         const nodes = getChildrenProps<INodeProps>(this.props.children) || [];
+        console.log("Rendering Edge Flow: " + nodes.length);
         const errorNodes = nodes.filter(n => n.x === undefined || isNaN(n.x) || n.y === undefined || isNaN(n.y));
         if (errorNodes.length > 0) {
             console.error("Missing X/Y", errorNodes);
@@ -89,8 +91,8 @@ export class EdgeFlow extends React.Component<IProps, IState> {
         const max = { x: maxBy(nodes, n => n.x).x * 1.1, y: maxBy(nodes, n => n.y).y * 1.1 };
         const min = { x: minBy(nodes, n => n.x).x * 0.9, y: minBy(nodes, n => n.y).y * 0.9 };
 
-        const scaleX = (x: number) => ((x - min.x) + (max.x - min.x) * 0.08) / ((max.x - min.x) * 1.16);
-        const scaleY = (y: number) => ((y - min.y) + (max.y - min.y) * 0.08) / ((max.y - min.y) * 1.16);
+        const scaleX = (x: number) => Math.round(((x - min.x) + (max.x - min.x) * 0.08) / ((max.x - min.x) * 1.16) * diagramWidth * 10) / 10;
+        const scaleY = (y: number) => Math.round(((y - min.y) + (max.y - min.y) * 0.08) / ((max.y - min.y) * 1.16) * diagramHeight * 10) / 10;
 
         type EdgeAndNodeType = IEdgeProps & { from: INodeProps };
 
@@ -104,162 +106,174 @@ export class EdgeFlow extends React.Component<IProps, IState> {
         const missingEdges = allEdges.filter(l => !nodeDict[l.linkTo]);
         if (missingEdges.length > 0) {
             console.error("Edges with Missing targets", missingEdges);
-            throw ("MIssing Target");
+            throw ("Missing Target");
         }
 
-        const compKey = (edge: EdgeAndNodeType, suffix: "to" | "from" | "p2" | "p3" | "source" | "target") => edge.from.id + "-" + edge.linkTo + "-" + suffix;
+        const compKey = (edge: EdgeAndNodeType) => edge.from.id + "-" + edge.linkTo;
 
-        const svgLineFn = style =>
-            allEdges.map(edge => {
-                const styleX = style[compKey(edge, "from") + "X"];
-                const styleY = style[compKey(edge, "from") + "Y"];
-                const styleP2X = style[compKey(edge, "p2") + "X"];
-                const styleP2Y = style[compKey(edge, "p2") + "Y"];
-                const styleP3X = style[compKey(edge, "p3") + "X"];
-                const styleP3Y = style[compKey(edge, "p3") + "Y"];
-                const styletoX = style[compKey(edge, "to") + "X"];
-                const styletoY = style[compKey(edge, "to") + "Y"];
-                if (!styleX || !styleY || !styletoX || !styletoY) throw "Invalid Style";
-                return <path key={edge.from.id + "-" + edge.linkTo}
-                    d={`M${styleX * diagramWidth} ${styleY * diagramHeight} C ${styleP2X * diagramWidth} ${styleP2Y * diagramHeight} ${styleP3X * diagramWidth} ${styleP3Y * diagramHeight} ${styletoX * diagramWidth} ${styletoY * diagramHeight}`}
-                    stroke={edge.pathColor || defaulltStrokeColor}
-                    opacity={edge.pathOpacity || 0.1}
-                    fill="transparent"
-                    strokeWidth={edge.pathWidth || 12}
-                />;
-            });
+        type EdgeStyle = {
+            key: string;
+            style: {
+                fromx?: number;
+                fromy?: number;
+                p2x?: number;
+                p2y?: number;
+                p3x?: number;
+                p3y?: number;
+                tox?: number;
+                toy?: number;
+                x?: number;
+                y?: number;
+            },
+            data: EdgeAndNodeType & INodeProps;
+        }
 
-        const edgeStyle = (edge: EdgeAndNodeType, edgePoint: IPoint, nodePoint: IPoint, prefix: "from" | "to" | "p2" | "p3", useSpring = false) =>
-            (edgePoint )
-                ? {
-                    [compKey(edge, prefix) + "X"]: useSpring ? spring(scaleX(edgePoint.x)) : scaleX(edgePoint.x),
-                    [compKey(edge, prefix) + "Y"]: useSpring ? spring(scaleY(edgePoint.y)) : scaleY(edgePoint.y)
-                } : {
-                    [compKey(edge, prefix) + "X"]: useSpring ? spring(scaleX(nodePoint.x)) : scaleX(nodePoint.x),
-                    [compKey(edge, prefix) + "Y"]: useSpring ? spring(scaleY(nodePoint.y)) : scaleY(nodePoint.y)
-                };
-
-        const nodeStyle = (node: INodeProps, point: IPoint, prefix: string) =>
-            ({
-                [node.id + "-" + prefix + "X"]: spring(scaleX(point.x)),
-                [node.id + "-" + prefix + "Y"]: spring(scaleY(point.y))
-            });
-
-        const defNodeStyle = (node: INodeProps, point: IPoint, prefix: string) =>
-            ({
-                [node.id + "-" + prefix + "X"]: scaleX(point.x),
-                [node.id + "-" + prefix + "Y"]: scaleY(point.y)
-            });
-
-        const defaultStyle = {
-            ...allEdges.reduce((p, edge) => ({
-                ...edgeStyle(edge, edge.source, edge.from, "from"),
-                ...edgeStyle(edge, edge.target, nodeDict[edge.linkTo], "to"),
-                ...edgeStyle(edge, edge.p2, edge.from, "p2"),
-                ...edgeStyle(edge, edge.p3, nodeDict[edge.linkTo], "p3"),
-                ...p
-            }), {}),
-            ...nodes.reduce((p, node) => ({
-                ...defNodeStyle(node, { x: node.x, y: node.y }, ""),
-                ...p
-            }), {})
-        };
-        const styleMotion = {
-            ...allEdges.reduce((p, edge) => ({
-                ...edgeStyle(edge, edge.source, edge.from, "from", true),
-                ...edgeStyle(edge, edge.target, nodeDict[edge.linkTo], "to", true),
-                ...edgeStyle(edge, edge.p2, edge.from, "p2", true),
-                ...edgeStyle(edge, edge.p3, nodeDict[edge.linkTo], "p3", true),
-                ...p
-            }), {}),
-            ...nodes.reduce((p, node) => ({
-                ...nodeStyle(node, { x: node.x, y: node.y }, ""),
-                ...p
-            }), {})
+        const svgLineFn = (styles: EdgeStyle[]) => {
+            return styles
+                .filter(style => !!style.data.ratePerSecond)
+                .map(edgeStyle => {
+                    const d = edgeStyle.style;
+                    const edge = edgeStyle.data;
+                    return <path key={edgeStyle.key}
+                        d={`M${d.fromx} ${d.fromy} C ${d.p2x} ${d.p2y} ${d.p3x} ${d.p3y} ${d.tox} ${d.toy}`}
+                        stroke={edge.pathColor || defaulltStrokeColor}
+                        opacity={edge.pathOpacity || 0.1}
+                        fill="transparent"
+                        strokeWidth={edge.pathWidth || 12}
+                    />;
+                });
         };
 
+        const edgeStyle = (edge: EdgeAndNodeType, useSpring = false) => {
+            const from = edge.source || edge.from;
+            const to = edge.target || nodeDict[edge.linkTo];
+            const p2 = edge.p2 || from;
+            const p3 = edge.p3 || to;
+            return {
+                key: compKey(edge),
+                style: {
+                    fromx: useSpring ? spring(scaleX(from.x)) : scaleX(from.x),
+                    fromy: useSpring ? spring(scaleY(from.y)) : scaleY(from.y),
+                    tox: useSpring ? spring(scaleX(to.x)) : scaleX(to.x),
+                    toy: useSpring ? spring(scaleY(to.y)) : scaleY(to.y),
+                    p2x: useSpring ? spring(scaleX(p2.x)) : scaleX(p2.x),
+                    p2y: useSpring ? spring(scaleY(p2.y)) : scaleY(p2.y),
+                    p3x: useSpring ? spring(scaleX(p3.x)) : scaleX(p3.x),
+                    p3y: useSpring ? spring(scaleY(p3.y)) : scaleY(p3.y),
+                },
+                data: edge
+            } as EdgeStyle;
+        }
+
+        const nodeStyle = (node: INodeProps, point: IPoint) =>
+            ({
+                key: node.id,
+                style: { x: spring(scaleX(point.x)), y: spring(scaleY(point.y)) },
+                data: node
+            });
+
+        const defNodeStyle = (node: INodeProps, point: IPoint) =>
+            ({
+                key: node.id,
+                style: { x: scaleX(point.x), y: scaleY(point.y) },
+                data: node
+            });
+
+        const defaultStyles = [
+            ...allEdges.map(edge => edgeStyle(edge)),
+            ...nodes.map(node => defNodeStyle(node, { x: node.x, y: node.y }))
+        ];
+        const springStyles = [
+            ...allEdges.map(edge => edgeStyle(edge, true)),
+            ...nodes.map(node =>
+                nodeStyle(node, { x: node.x, y: node.y })
+            )
+        ];
         return (
             <div key="root" style={composedStyle} >
-                <svg width={width} height={height} style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
+                <svg key="svg" width={width} height={height} style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
                     onClick={() => onClickNode({ nodeId: null, graph: null, screen: null })}>
-                    <Motion defaultStyle={defaultStyle} style={styleMotion}>{
-                        style => <g>{[
-                            ...svgLineFn(style),
-                            ...nodes
-                                .filter(node => node.label)
-                                .map(node =>
-                                    <WrappedSvgText key={"TEXT-" + node.id}
-                                        x={style[node.id + "-X"] * diagramWidth} y={style[node.id + "-Y"] * diagramHeight}
-                                        height={60} width={80} fontWeight={node.group ? 800 : 400}
-                                        text={`${node.label}`} lineHeight={14} fontWidth={12}
-                                        textColor={node.labelColor || "#fff8f8"} />),
-                            ...nodes
-                                .filter(node => !node.group && !node.annotation)
-                                .map(node => node.symbol
-                                    ? <text key={"SYM-" + node.id}
-                                        x={style[node.id + "-X"] * diagramWidth} y={style[node.id + "-Y"] * diagramHeight}
-                                        height={20} width={80}
-                                        onClick={(c) => {
-                                            onClickNode({ nodeId: node.id, graph: { x: node.x, y: node.y }, screen: null });
-                                            c.stopPropagation();
-                                        }}
-                                        style={{
-                                            fontFamily: node.symbolFont || "FontAwesome",
-                                            fontSize: node.symbolSize || 23,
-                                            textAnchor: "middle",
-                                            alignmentBaseline: "central",
-                                            dominantBaseline: "central",
-                                            fill: node.symbolColor || "#fff8f8",
-                                            strokeWidth: 1,
-                                            stroke: "#303050",
-                                        }}>{node.symbol}</text>
-                                    : <circle key={"SYM-" + node.id}
-                                        cx={style[node.id + "-X"] * diagramWidth} cy={style[node.id + "-Y"] * diagramHeight}
-                                        onClick={c => {
-                                            // console.log("CLICK", c);
-                                            onClickNode({ nodeId: node.id, graph: { x: node.x, y: node.y }, screen: null });
-                                            c.stopPropagation();
-                                        }}
-                                        r={((selectedNodeId === node.id) ? 9 : 5)}
-                                        fill={node.symbolColor || "#80ff80"}
-                                        strokeWidth={(selectedNodeId === node.id) ? 3 : 0}
-                                        stroke={(selectedNodeId === node.id) ? "white" : "transparent"}
-                                    />)
-                        ]}</g>}
-                    </Motion>)
+                    <TransitionMotion key="svg-anim" defaultStyles={defaultStyles} styles={springStyles}>{
+                        (styles: EdgeStyle[]) =>
+                            <g key="g">{[
+                                ...svgLineFn(styles),
+                                ...styles
+                                    .filter(style => style.data.label)
+                                    .map(nodeStyle =>
+                                        <WrappedSvgText key={"TEXT-" + nodeStyle.key}
+                                            x={nodeStyle.style.x} y={nodeStyle.style.y}
+                                            height={60} width={80} fontWeight={nodeStyle.data.group ? 800 : 400}
+                                            text={`${nodeStyle.data.label}`}
+                                            lineHeight={14}
+                                            fontWidth={12}
+                                            textColor={nodeStyle.data.labelColor || "#fff8f8"} />),
+                                ...styles
+                                    .filter(style => !style.data.ratePerSecond && !style.data.group && !style.data.annotation)
+                                    .map(nodeStyle =>
+                                        nodeStyle.data.symbol
+                                            ? <text key={"SYM-" + nodeStyle.key}
+                                                x={nodeStyle.style.x} y={nodeStyle.style.y}
+                                                height={20} width={80}
+                                                onClick={(c) => {
+                                                    onClickNode({ nodeId: nodeStyle.key, graph: { x: nodeStyle.style.x, y: nodeStyle.style.y }, screen: null });
+                                                    c.stopPropagation();
+                                                }}
+                                                style={{
+                                                    fontFamily: nodeStyle.data.symbolFont || "FontAwesome",
+                                                    fontSize: nodeStyle.data.symbolSize || 23,
+                                                    textAnchor: "middle",
+                                                    alignmentBaseline: "central",
+                                                    dominantBaseline: "central",
+                                                    fill: nodeStyle.data.symbolColor || "#fff8f8",
+                                                    strokeWidth: 1,
+                                                    stroke: "#303050",
+                                                }}>{nodeStyle.data.symbol}</text>
+                                            : <circle key={"SYM-" + nodeStyle.key}
+                                                cx={nodeStyle.style.x} cy={nodeStyle.style.y}
+                                                onClick={c => {
+                                                    // console.log("CLICK", c);
+                                                    onClickNode({ nodeId: nodeStyle.key, graph: { x: nodeStyle.style.x, y: nodeStyle.style.y }, screen: null });
+                                                    c.stopPropagation();
+                                                }}
+                                                r={((selectedNodeId === nodeStyle.key) ? 9 : 5)}
+                                                fill={nodeStyle.data.symbolColor || "#80ff80"}
+                                                strokeWidth={(selectedNodeId === nodeStyle.key) ? 3 : 0}
+                                                stroke={(selectedNodeId === nodeStyle.key) ? "white" : "transparent"}
+                                            />)
+                            ]}</g>}
+                    </TransitionMotion>)
                 </svg>
                 <div key="particleContainer"
                     style={{ pointerEvents: "none", position: "absolute", left: 0, top: 0 }}>
-                    <Motion defaultStyle={defaultStyle} style={styleMotion}>{
-                        style =>
+                    <TransitionMotion key={"motion-anim"} defaultStyles={defaultStyles} styles={springStyles}>{
+                        (styles: EdgeStyle[]) =>
                             <ParticleCanvas key="particles"
                                 width={diagramWidth}
                                 height={diagramHeight}
                                 run={run}
                                 backgroundColor={backgroundColor}>
                                 {
-                                    allEdges.map(edge =>
-                                        <ParticleEdge key={edge.from.id + "-" + edge.linkTo}
-                                            {...edge}
-
-                                            fromX={style[compKey(edge, "from") + "X"]}
-                                            fromY={1 - style[compKey(edge, "from") + "Y"]}
-                                            toX={style[compKey(edge, "to") + "X"]}
-                                            toY={1 - style[compKey(edge, "to") + "Y"]}
-                                            p2={{
-                                                x: style[compKey(edge, "p2") + "X"],
-                                                y: 1 - style[compKey(edge, "p2") + "Y"]
-                                            }}
-                                            p3={{
-                                                x: style[compKey(edge, "p3") + "X"],
-                                                y: 1 - style[compKey(edge, "p3") + "Y"]
-                                            }}
-                                            ratePerSecond={edge.ratePerSecond}
-                                        />
-                                    )
+                                    styles
+                                        .filter(edge => edge.data.ratePerSecond)
+                                        .map(edgeStyle =>
+                                            <ParticleEdge key={compKey(edgeStyle.data)}
+                                                {...edgeStyle.data}
+                                                fromX={edgeStyle.style.fromx / diagramWidth}
+                                                fromY={1 - edgeStyle.style.fromy / diagramHeight}
+                                                toX={edgeStyle.style.tox / diagramWidth}
+                                                toY={1 - edgeStyle.style.toy / diagramHeight}
+                                                p2={{
+                                                    x: edgeStyle.style.p2x / diagramWidth,
+                                                    y: 1 - edgeStyle.style.p2y / diagramHeight
+                                                }}
+                                                p3={{
+                                                    x: edgeStyle.style.p3x / diagramWidth,
+                                                    y: 1 - edgeStyle.style.p3y / diagramHeight
+                                                }}
+                                            />)
                                 }
                             </ParticleCanvas>}
-                    </Motion>
+                    </TransitionMotion>
                 </div>
             </div >
         );

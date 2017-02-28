@@ -11,7 +11,7 @@ export interface IProps extends IBaseProps {
 export interface IState {
     nodes?: IPosNode[];
 }
-export declare class EdgeFlowDag extends React.Component<IProps, IState> {
+export declare class EdgeFlowDag extends React.PureComponent<IProps, IState> {
     constructor(p: IProps);
     private getStateFromProps(newProps);
     private componentWillReceiveProps(newProps);

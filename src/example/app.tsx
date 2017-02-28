@@ -58,7 +58,7 @@ class App extends React.Component<any, IState> {
         const {screen, width, height, animate, animationIndex} = this.state;
         const buttonStyle = { height: 50, width: 130, margin: 5, color: "black" };
         return (<div key="root" id="root"
-            style={{ backgroundColor: "green", overflow: "hidden" }}
+            style={{ backgroundColor: "black", overflow: "hidden" }}
             ref={div => this.div = div}>
             <div style={{ height: 60 }}>
                 <button key="pause" style={buttonStyle}
@@ -73,7 +73,7 @@ class App extends React.Component<any, IState> {
             {screen == Screen.SWIRL ?
                 <Swirl animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
                 : (screen == Screen.PARTITION) ? <Partition animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
-                    : <Network animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
+                    : <Network animate={animate}  height={height - 60} width={width} />
             }
         </div>
         )
