@@ -135,7 +135,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                     const d = edgeStyle.style;
                     const edge = edgeStyle.data;
                     return <path key={edgeStyle.key}
-                        d={`M${d.fromx} ${d.fromy} C ${d.p2x} ${d.p2y} ${d.p3x} ${d.p3y} ${d.tox} ${d.toy}`}
+                        d={`M${d.fromx},${d.fromy} C ${d.p2x},${d.p2y} ${d.p3x},${d.p3y} ${d.tox},${d.toy}`}
                         stroke={edge.pathColor || defaulltStrokeColor}
                         opacity={edge.pathOpacity || 0.1}
                         fill="transparent"

@@ -126,7 +126,6 @@ export default class Particles {
                 this.textureData.setVec2(BEZIER_ROW, edgeIndex,
                     convertBezierPoints(edge.p2, edge.p2),//{ x: edge.fromX, y: edge.fromY }),
                     convertBezierPoints(edge.p3, edge.p3));//{ x: edge.toX, y: edge.toY }));
-
                 edgeIndex++;
             }
             this.program.use();

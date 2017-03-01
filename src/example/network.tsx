@@ -72,7 +72,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
                     <NodeDag key="target" id="target" symbol={"\uf109"} symbolColor="white" symbolSize={50}>
                     </NodeDag>,
                     ...this.state.nodes.map((n, i) => <NodeDag key={"node" + i} id={"node" + i} symbol={"\uf109"} symbolColor="white" symbolSize={50}>
-                        <EdgeDag linkTo="target" ratePerSecond={8} size={10} variationMax={0.02} variationMin={-0.02} shape={1} color="green" endingColor="red" />
+                        <EdgeDag linkTo="target" ratePerSecond={8} size={20} variationMax={0.04} variationMin={-0.04} shape={1} color="green" endingColor="red" />
                     </NodeDag>)
                 ]}
             </EdgeFlowDag>

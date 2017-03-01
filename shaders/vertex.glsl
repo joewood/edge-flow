@@ -16,18 +16,21 @@ uniform float vertexRow;
 uniform float endColorRow;
 uniform float variationRow;
 
-float random(vec2 co)
-{
+float random(vec2 co) {
     return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
 }
 
-vec2 toBezier(float delta, int i, vec2 P0, vec2 P1, vec2 P2, vec2 P3)
-{
-    float t = delta * float(i);
-    float t2 = t * t;
-    float one_minus_t = 1.0 - t;
-    float one_minus_t2 = one_minus_t * one_minus_t;
-    return (P0 * one_minus_t2 * one_minus_t + P1 * 3.0 * t * one_minus_t2 + P2 * 3.0 * t2 * one_minus_t + P3 * t2 * t);
+vec2 toBezier(float t, vec2 p0, vec2 p1, vec2 p2, vec2 p3) {
+    float u = 1.0-t;
+    float tt = t*t;
+    float uu = u*u;
+    float uuu = uu*u;
+    float ttt = tt*t;
+    vec2 p = uuu*p0;
+    p = p + 3.0 * uu * t * p1;
+    p = p + 3.0 * u * tt * p2;
+    p = p + ttt * p3;
+    return p;
 }
 
 void main() {
@@ -50,13 +53,14 @@ void main() {
         to += (nodeVariation * rnd-nodeVariation/2.0);
     }
     vec2 middle = vec2(rnd * variations.z + variations.x,rnd * variations.z + variations.x);
+    vec2 mid = toBezier(0.5, from, bezier.xy, bezier.zw, to); 
 
     // position is linear between source and target
     // vec2 p1 = mix(from,to,timefrac);
-    vec2 p1 = toBezier(timefrac, 1, from, bezier.xy, bezier.zw, to);
+    vec2 p1 = toBezier(timefrac, from, bezier.xy, bezier.zw, to);
 
     // add some variation with a mixed in mid point 0t=0 0.25t=0.25(0.15) 0.5t=0.5(0.15) 1t=0
-    vec2 p = mix(p1,middle+(to+from)/2.0,clamp(0.5-abs(timefrac-0.5),0.0,0.15));
+    vec2 p = mix(p1,middle+mid,clamp(0.5-abs(timefrac-0.5),0.0,0.15));
     gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
     gl_PointSize = size*256.0;
     vec4 color = texture2D(edgeData,vec2(edgeIndex/edgeCount,colorRow));
