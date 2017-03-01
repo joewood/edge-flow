@@ -43,11 +43,52 @@ import { EdgeFlow, Node, Edge } from "edge-flow"
     }
 ```                     
 
-## Components and Properties
+# Components and Properties
 
-### EdgeFlow
 
-Main component representing the Graph.
+
+## Animated Directed Acrylic Graph - EdgeFlowDag
+
+For a live demo see [here](http://joewood.github.io/#network).
+
+Prop            | Datatype | Description
+----------------|----------|------------
+backgroundColor | string   | Background Color of the canvas
+height, width   | number   | Size of the Graph
+run             | boolean  | Animate Graph 
+
+### NodeDag
+
+Prop            | Datatype | Description
+----------------|----------|------------
+id              | string   | Used to identify the node (for edges)
+label?          | string   | Label attached to the Node
+labelColor?     | string   | Color of the label text
+symbol?         | string   | String used for a font-icon (e.g. FontAwesome)
+symbolColor?    | string   | Color for symbol font-icon
+symbolSize?     | number   | Size of font-icon
+symbolFont?     | string   | Symbol Font name (e.g. "fontawesome")
+
+### EdgeDag
+
+Prop            | Datatype | Description
+----------------|----------|------------
+linkTo          | string   | The `id` of the node to link to
+ratePerSecond   | number   | How many particles animating per second through the edge
+variationMin?   | number   | The minimum width of the Edge for random dispersal (default -0.01)
+variationMax?   | number   | The maximum width of the Edge for random dispersal (default 0.01)
+color?          | string   | Color of the particle (or color at starting position)
+endingColor?    | string   | Color of the particle at the target position (optional, defaults to starting color) 
+shape?          | number   | Roundness of particle range 0..1 - 1 being circle, 0 being square
+size?           | number   | Size of the particles (range 1..20)
+pathColor?      | string   | Color of the edge's path (defaults to lighter shade of canvas background)
+pathWidth?      | number   | Width of the line for the edge's path (default 12)
+pathOpacity?    | number   | Opacity of the path for the edge (default is 0.2)
+nonrandom       | boolean  | Disable random distribution of particles (evenly spaced)
+
+## EdgeFlow
+
+Main underlying component providing absolute positioning
 
 Prop            | Datatype | Description
 ----------------|----------|------------
@@ -87,4 +128,6 @@ size?           | number   | Size of the particles (range 1..20)
 pathColor?      | string   | Color of the edge's path (defaults to lighter shade of canvas background)
 pathWidth?      | number   | Width of the line for the edge's path (default 12)
 pathOpacity?    | number   | Opacity of the path for the edge (default is 0.2)
-
+source?         | {x,y}    | Starting point of edge (defaults to the connected node)
+target?         | {x,y}    | Ending point of edge (defaults to the connected node)
+p2?, p3?        | {x,y}    | Cubic bezier control points
