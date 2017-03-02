@@ -6,10 +6,6 @@ import TextureData from "./texture-data";
 import { IEdge as IModelEdge, IPoint } from "./model"
 
 export interface IParticleEdge extends IModelEdge {
-    fromX: number;
-    fromY: number;
-    toX: number;
-    toY: number;
 }
 
 // texture buffer used to hold vertex information
@@ -113,8 +109,8 @@ export default class Particles {
                 const variationMax = (edge.variationMax === undefined) ? 0.01 : edge.variationMax;
                 // set-up vertices in edgedata
                 this.textureData.setVec2(VERTEX_ROW, edgeIndex,
-                    convertBezierPoints({ x: edge.fromX, y: edge.fromY }, { x: edge.fromX, y: edge.fromY }),
-                    convertBezierPoints({ x: edge.toX, y: edge.toY }, { x: edge.toX, y: edge.toY }));
+                    convertBezierPoints(edge.p0, edge.p0),
+                    convertBezierPoints(edge.p3, edge.p3));
                 // random variation of the particles
                 this.textureData.setValue(VARIATION_ROW, edgeIndex, variationMin, variationMax, variationMax - variationMin, Math.random());
                 // set-up color in edge Data
@@ -124,8 +120,8 @@ export default class Particles {
                 this.textureData.setValue(SHAPE_ROW, edgeIndex, (edge.size || this.size || 8.0) / 256, edge.shape || 0.0, 0.0, 0.0);
                 // bezier
                 this.textureData.setVec2(BEZIER_ROW, edgeIndex,
-                    convertBezierPoints(edge.p2, edge.p2),//{ x: edge.fromX, y: edge.fromY }),
-                    convertBezierPoints(edge.p3, edge.p3));//{ x: edge.toX, y: edge.toY }));
+                    convertBezierPoints(edge.p1, edge.p1),//{ x: edge.fromX, y: edge.fromY }),
+                    convertBezierPoints(edge.p2, edge.p2));//{ x: edge.toX, y: edge.toY }));
                 edgeIndex++;
             }
             this.program.use();

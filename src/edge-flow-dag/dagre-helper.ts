@@ -8,10 +8,10 @@ import { Node, INodeDagProps } from "./dag-node";
 
 export interface IPosEdge {
     linkTo: string;
+    p0: IPoint;
     p1: IPoint;
     p2: IPoint;
     p3: IPoint;
-    p4: IPoint;
 }
 
 export interface IPosNode {
@@ -79,10 +79,10 @@ export function getLayout(
         if (posNodesDict[edge.v]) {
             posNodesDict[edge.v].edges.push({
                 linkTo: edge.w,
-                p1: e.points[0],
-                p2: e.points[1] || e.points[0],
-                p3: e.points[2] || e.points[1] || e.points[0],
-                p4: e.points.slice(-1)[0],
+                p0: e.points[0],
+                p1: e.points[1] || e.points[0],
+                p2: e.points[2] || e.points[1] || e.points[0],
+                p3: e.points.slice(-1)[0],
             });
         } else {
             console.error("edge in layout has missing source node",edge);

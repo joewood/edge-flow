@@ -41,12 +41,12 @@ export interface IPositionlessEdge {
 
 export interface IEdge extends IPositionlessEdge {
     /** Optional source, defaults to the source node */
-    source?: IPoint;
+    p0?: IPoint;
+    /** Used for bezier cubic curve */
+    p1?: IPoint;
     /** Used for bezier cubic curve */
     p2?: IPoint;
-    /** Used for bezier cubic curve */
-    p3?: IPoint;
     /** Optional target, use target node by default */
-    target?: IPoint;
+    p3?: IPoint;
 }
 

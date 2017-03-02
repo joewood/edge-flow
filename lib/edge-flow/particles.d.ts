@@ -1,9 +1,5 @@
 import { IEdge as IModelEdge } from "./model";
 export interface IParticleEdge extends IModelEdge {
-    fromX: number;
-    fromY: number;
-    toX: number;
-    toY: number;
 }
 export default class Particles {
     private canvas;

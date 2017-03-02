@@ -4,10 +4,10 @@ import { IPoint } from "../edge-flow/model";
 import { INodeDagProps } from "./dag-node";
 export interface IPosEdge {
     linkTo: string;
+    p0: IPoint;
     p1: IPoint;
     p2: IPoint;
     p3: IPoint;
-    p4: IPoint;
 }
 export interface IPosNode {
     x: number;
