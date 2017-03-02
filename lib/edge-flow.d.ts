@@ -21,6 +21,10 @@ export interface IBaseProps {
         height: number;
         backgroundColor?: string;
     };
+    nodeSize?: {
+        width: number;
+        height: number;
+    };
     onClickNode?: (args: NodeClickEventArgs) => void;
     selectedNodeId?: string;
 }

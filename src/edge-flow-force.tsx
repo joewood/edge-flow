@@ -74,7 +74,7 @@ export class EdgeFlowForce extends React.Component<IProps, IState> {
         const groupedEdges = groupBy(allEdges, e => e.fromForceNode);
         return (<EdgeFlow {...props}>
             {
-                nodes.map(node => <Node key={node.id} x={posNodes[node.id].x} y={posNodes[node.id].y} {...node} >
+                nodes.map(node => <Node key={node.id} center={posNodes[node.id]} {...node} >
                     {groupedEdges[node.id] && groupedEdges[node.id].map(edge => <Edge key={edge.fromForceNode + "-" + edge.linkTo} {...edge} />)}
                 </Node>)
             }

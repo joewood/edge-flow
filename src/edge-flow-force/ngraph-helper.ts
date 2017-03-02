@@ -47,8 +47,8 @@ export function getLayout(g: any, childrenNodes: React.ReactElement<INodeForcePr
     : IPosNode[] {
     const forceLayout = layout(g);
     eachChild<INodeForceProps, any>(childrenNodes, nodeProp => {
-        if (!isNaN(nodeProp.x) && !isNaN(nodeProp.y)) {
-            forceLayout.setNodePosition(nodeProp.id, nodeProp.x, nodeProp.y);
+        if (!isNaN(nodeProp.center.x) && !isNaN(nodeProp.center.y)) {
+            forceLayout.setNodePosition(nodeProp.id, nodeProp.center.x, nodeProp.center.y);
             if (nodeProp.fixed) {
                 const node = g.getNode(nodeProp.id);
                 forceLayout.pinNode(node, true);

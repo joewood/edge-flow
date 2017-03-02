@@ -78,7 +78,7 @@ export class EdgeFlowDag extends React.PureComponent<IProps, IState> {
         return (<EdgeFlow {...props}>{
             nodes
                 .map(node => (
-                    <Node key={node.id} x={Math.round(posNodes[node.id].x * 100) / 100} y={Math.round(posNodes[node.id].y * 100) / 100} {...node} >
+                    <Node key={node.id} center={posNodes[node.id]} {...node} >
                         {groupedEdges[node.id] && groupedEdges[node.id].map(edge => {
                             const ee = edgeDict[node.id + "-" + edge.linkTo];
                             return <Edge key={edge.fromForceNode + "-" + edge.linkTo}

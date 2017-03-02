@@ -1,8 +1,10 @@
 import * as BaseModel from '../edge-flow/model';
 
 export interface INode extends BaseModel.IPositionlessNode {
-    x?: number;
-    y?: number;
+    center?:{
+        x: number;
+        y: number;
+    }
     mass?: number; // default 1
     fixed?: boolean;
     lockXTo?: string;

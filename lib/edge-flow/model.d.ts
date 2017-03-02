@@ -8,16 +8,17 @@ export interface IPositionlessNode {
     id: string;
     annotation?: boolean;
     group?: boolean;
+    width?: number;
+    height?: number;
 }
 export interface INode extends IPositionlessNode {
-    x: number;
-    y: number;
+    center: IPoint;
 }
 export interface IPoint {
     x: number;
     y: number;
 }
-export interface IEdge {
+export interface IPositionlessEdge {
     linkTo: string;
     ratePerSecond?: number;
     name?: string;
@@ -31,6 +32,8 @@ export interface IEdge {
     variationMin?: number;
     variationMax?: number;
     endingColor?: string;
+}
+export interface IEdge extends IPositionlessEdge {
     /** Optional source, defaults to the source node */
     source?: IPoint;
     /** Used for bezier cubic curve */

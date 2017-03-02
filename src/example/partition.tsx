@@ -35,20 +35,20 @@ export default class Partition extends React.Component<IProps, IState> {
         const inc = this.inc++;
         const sourceInc = Math.floor(inc / 2);
         return [
-            (!(inc % 2)) && <Node key={"source" + sourceInc} id={"source" + sourceInc} label="source" x={x} y={y}  >
+            (!(inc % 2)) && <Node key={"source" + sourceInc} id={"source" + sourceInc} label="source" center={{ x: x, y: y }}  >
                 <Edge linkTo={"head" + inc} color="red" shape={1.0} size={12} ratePerSecond={20} pathColor="black" />
                 <Edge linkTo={"head" + (inc + 1)} color="red" shape={1.0} size={12} ratePerSecond={20} pathColor="black" />
             </Node>,
-            <Node key={"head" + inc} id={"head" + inc} x={x + 5 + inc} y={y + 10} group >
+            <Node key={"head" + inc} id={"head" + inc} center={{ x: x + 5 + inc, y: y + 10 }} group >
                 <Edge linkTo={"tail" + inc} color="rgb(255,224,224)" shape={0.01} size={6} nonrandom pathOpacity={1}
                     variationMax={0} variationMin={0}
                     endingColor="rgba(55,55,55,0.0)" pathColor="#101010" pathWidth={20} ratePerSecond={12} />
             </Node >,
-            <Node key={"tail" + inc} id={"tail" + inc} x={x + 5 + inc} y={y + 55} group />,
-            <Node key={"deq" + inc} id={"deq" + inc} x={x + 5.1 + inc} y={y + 15} group>
+            <Node key={"tail" + inc} id={"tail" + inc} center={{ x: x + 5 + inc, y: y + 55 }} group />,
+            <Node key={"deq" + inc} id={"deq" + inc} center={{ x: x + 5.1 + inc, y: y + 15 }} group>
                 <Edge linkTo={"sink" + inc} ratePerSecond={20} shape={1} size={12} color="#a0a0a0" pathColor="black" />
             </Node>,
-            <Node key={"sink" + inc} id={"sink" + inc} x={x + 20} y={y} label="sink" />
+            <Node key={"sink" + inc} id={"sink" + inc} center={{ x: x + 20, y: y }} label="sink" />
         ].filter(f => !!f);
     }
 

@@ -32,6 +32,7 @@ export interface IBaseProps {
         height: number;
         backgroundColor?: string;
     }
+    nodeSize?:{width:number,height:number},
     onClickNode?: (args: NodeClickEventArgs) => void;
     selectedNodeId?: string;
 }
@@ -53,6 +54,66 @@ const styles = {
     } as React.CSSProperties
 }
 
+type EdgeAndNodeType = IEdgeProps & { from: INodeProps };
+
+
+type MotionStyle = {
+    key: string;
+    style: {
+        fromx?: number;
+        fromy?: number;
+        p2x?: number;
+        p2y?: number;
+        p3x?: number;
+        p3y?: number;
+        tox?: number;
+        toy?: number;
+        x?: number;
+        y?: number;
+    },
+    data: EdgeAndNodeType & INodeProps & { isNode: boolean };
+}
+
+const compKey = (edge: EdgeAndNodeType) => edge.from.id + "-" + edge.linkTo;
+
+
+const scaleX = (x: number, min: IPoint, max: IPoint, diagramWidth: number) => Math.round(((x - min.x) + (max.x - min.x) * 0.08) / ((max.x - min.x) * 1.16) * diagramWidth * 10) / 10;
+const scaleY = (y: number, min: IPoint, max: IPoint, diagramHeight: number) => Math.round(((y - min.y) + (max.y - min.y) * 0.08) / ((max.y - min.y) * 1.16) * diagramHeight * 10) / 10;
+
+function createEdgeStyle(edge: EdgeAndNodeType, nodeDict: Dictionary<INodeProps>, min: IPoint, max: IPoint, size: IPoint, useSpring = false): MotionStyle {
+    const from = edge.source || edge.from.center;
+    const to = edge.target || nodeDict[edge.linkTo].center;
+    const p2 = edge.p2 || from;
+    const p3 = edge.p3 || to;
+    return {
+        key: compKey(edge),
+        style: {
+            fromx: useSpring ? spring(scaleX(from.x, min, max, size.x)) : scaleX(from.x, min, max, size.x),
+            fromy: useSpring ? spring(scaleY(from.y, min, max, size.y)) : scaleY(from.y, min, max, size.y),
+            tox: useSpring ? spring(scaleX(to.x, min, max, size.x)) : scaleX(to.x, min, max, size.x),
+            toy: useSpring ? spring(scaleY(to.y, min, max, size.y)) : scaleY(to.y, min, max, size.y),
+            p2x: useSpring ? spring(scaleX(p2.x, min, max, size.x)) : scaleX(p2.x, min, max, size.x),
+            p2y: useSpring ? spring(scaleY(p2.y, min, max, size.y)) : scaleY(p2.y, min, max, size.y),
+            p3x: useSpring ? spring(scaleX(p3.x, min, max, size.x)) : scaleX(p3.x, min, max, size.x),
+            p3y: useSpring ? spring(scaleY(p3.y, min, max, size.y)) : scaleY(p3.y, min, max, size.y),
+        },
+        data: {isNode:false,...edge},
+    } as MotionStyle;
+}
+
+
+function createNodeStyle(node: INodeProps, point: IPoint, min: IPoint, max: IPoint, size: IPoint, useSpring = false) {
+    return {
+        key: node.id,
+        style: {
+            x: useSpring ? spring(scaleX(point.x, min, max, size.x)) : scaleX(point.x, min, max, size.x),
+            y: useSpring ? spring(scaleY(point.y, min, max, size.y)) : scaleY(point.y, min, max, size.y)
+        },
+        data: {isNode:true,...node},
+    } as MotionStyle;
+}
+
+
 /** Helper function, return the props of a children element */
 function getChildrenProps<T>(children: React.ReactNode): T[] {
     return React.Children.map<T>(children, child => (child as any).props) || [];
@@ -68,7 +129,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
     public render() {
         const nodes = getChildrenProps<INodeProps>(this.props.children) || [];
         console.log("Rendering Edge Flow: " + nodes.length);
-        const errorNodes = nodes.filter(n => n.x === undefined || isNaN(n.x) || n.y === undefined || isNaN(n.y));
+        const errorNodes = nodes.filter(n => n.center.x === undefined || isNaN(n.center.x) || n.center.y === undefined || isNaN(n.center.y));
         if (errorNodes.length > 0) {
             console.error("Missing X/Y", errorNodes);
             throw "Error Nodes";
@@ -87,19 +148,14 @@ export class EdgeFlow extends React.Component<IProps, IState> {
             ...styles.container,
             ...style
         };
+        const size = { x: diagramWidth, y: diagramHeight };
         if (nodes.length === 0) return <div />;
-        const max = { x: maxBy(nodes, n => n.x).x * 1.1, y: maxBy(nodes, n => n.y).y * 1.1 };
-        const min = { x: minBy(nodes, n => n.x).x * 0.9, y: minBy(nodes, n => n.y).y * 0.9 };
-
-        const scaleX = (x: number) => Math.round(((x - min.x) + (max.x - min.x) * 0.08) / ((max.x - min.x) * 1.16) * diagramWidth * 10) / 10;
-        const scaleY = (y: number) => Math.round(((y - min.y) + (max.y - min.y) * 0.08) / ((max.y - min.y) * 1.16) * diagramHeight * 10) / 10;
-
-        type EdgeAndNodeType = IEdgeProps & { from: INodeProps };
+        const max = { x: maxBy(nodes, n => n.center.x).center.x * 1.1, y: maxBy(nodes, n => n.center.y).center.y * 1.1 };
+        const min = { x: minBy(nodes, n => n.center.x).center.x * 0.9, y: minBy(nodes, n => n.center.y).center.y * 0.9 };
 
         const allEdges = nodes.reduce((p, node: INodeProps) => [
             ...p,
             ...(getChildrenProps<IEdgeProps>(node.children) || [])
-                .filter(edge => !isNaN(edge.ratePerSecond) && (edge.ratePerSecond > 0))
                 .map(l => ({ from: node, ...l } as EdgeAndNodeType))
         ], [] as EdgeAndNodeType[]);
 
@@ -109,33 +165,14 @@ export class EdgeFlow extends React.Component<IProps, IState> {
             throw ("Missing Target");
         }
 
-        const compKey = (edge: EdgeAndNodeType) => edge.from.id + "-" + edge.linkTo;
-
-        type EdgeStyle = {
-            key: string;
-            style: {
-                fromx?: number;
-                fromy?: number;
-                p2x?: number;
-                p2y?: number;
-                p3x?: number;
-                p3y?: number;
-                tox?: number;
-                toy?: number;
-                x?: number;
-                y?: number;
-            },
-            data: EdgeAndNodeType & INodeProps;
-        }
-
-        const svgLineFn = (styles: EdgeStyle[]) => {
+        const svgLineFn = (styles: MotionStyle[]) => {
             return styles
-                .filter(style => !!style.data.ratePerSecond)
+                .filter(style => !style.data.isNode)
                 .map(edgeStyle => {
-                    const d = edgeStyle.style;
+                    const style = edgeStyle.style;
                     const edge = edgeStyle.data;
                     return <path key={edgeStyle.key}
-                        d={`M${d.fromx},${d.fromy} C ${d.p2x},${d.p2y} ${d.p3x},${d.p3y} ${d.tox},${d.toy}`}
+                        d={`M${style.fromx},${style.fromy} C ${style.p2x},${style.p2y} ${style.p3x},${style.p3y} ${style.tox},${style.toy}`}
                         stroke={edge.pathColor || defaulltStrokeColor}
                         opacity={edge.pathOpacity || 0.1}
                         fill="transparent"
@@ -144,49 +181,15 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                 });
         };
 
-        const edgeStyle = (edge: EdgeAndNodeType, useSpring = false) => {
-            const from = edge.source || edge.from;
-            const to = edge.target || nodeDict[edge.linkTo];
-            const p2 = edge.p2 || from;
-            const p3 = edge.p3 || to;
-            return {
-                key: compKey(edge),
-                style: {
-                    fromx: useSpring ? spring(scaleX(from.x)) : scaleX(from.x),
-                    fromy: useSpring ? spring(scaleY(from.y)) : scaleY(from.y),
-                    tox: useSpring ? spring(scaleX(to.x)) : scaleX(to.x),
-                    toy: useSpring ? spring(scaleY(to.y)) : scaleY(to.y),
-                    p2x: useSpring ? spring(scaleX(p2.x)) : scaleX(p2.x),
-                    p2y: useSpring ? spring(scaleY(p2.y)) : scaleY(p2.y),
-                    p3x: useSpring ? spring(scaleX(p3.x)) : scaleX(p3.x),
-                    p3y: useSpring ? spring(scaleY(p3.y)) : scaleY(p3.y),
-                },
-                data: edge
-            } as EdgeStyle;
-        }
 
-        const nodeStyle = (node: INodeProps, point: IPoint) =>
-            ({
-                key: node.id,
-                style: { x: spring(scaleX(point.x)), y: spring(scaleY(point.y)) },
-                data: node
-            });
-
-        const defNodeStyle = (node: INodeProps, point: IPoint) =>
-            ({
-                key: node.id,
-                style: { x: scaleX(point.x), y: scaleY(point.y) },
-                data: node
-            });
 
         const defaultStyles = [
-            ...allEdges.map(edge => edgeStyle(edge)),
-            ...nodes.map(node => defNodeStyle(node, { x: node.x, y: node.y }))
+            ...allEdges.map(edge => createEdgeStyle(edge, nodeDict, min, max, size, )),
+            ...nodes.map(node => createNodeStyle(node, node.center, min, max, size))
         ];
         const springStyles = [
-            ...allEdges.map(edge => edgeStyle(edge, true)),
-            ...nodes.map(node =>
-                nodeStyle(node, { x: node.x, y: node.y })
+            ...allEdges.map(edge => createEdgeStyle(edge, nodeDict, min, max, size, true)),
+            ...nodes.map(node => createNodeStyle(node, node.center, min, max, size, true)
             )
         ];
         return (
@@ -194,11 +197,11 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                 <svg key="svg" width={width} height={height} style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
                     onClick={() => onClickNode({ nodeId: null, graph: null, screen: null })}>
                     <TransitionMotion key="svg-anim" defaultStyles={defaultStyles} styles={springStyles}>{
-                        (styles: EdgeStyle[]) =>
+                        (styles: MotionStyle[]) =>
                             <g key="g">{[
                                 ...svgLineFn(styles),
                                 ...styles
-                                    .filter(style => style.data.label)
+                                    .filter(style => style.data.isNode && style.data.label)
                                     .map(nodeStyle =>
                                         <WrappedSvgText key={"TEXT-" + nodeStyle.key}
                                             x={nodeStyle.style.x} y={nodeStyle.style.y}
@@ -208,7 +211,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                             fontWidth={12}
                                             textColor={nodeStyle.data.labelColor || "#fff8f8"} />),
                                 ...styles
-                                    .filter(style => !style.data.ratePerSecond && !style.data.group && !style.data.annotation)
+                                    .filter(style => style.data.isNode && !style.data.group && !style.data.annotation)
                                     .map(nodeStyle =>
                                         nodeStyle.data.symbol
                                             ? <text key={"SYM-" + nodeStyle.key}
@@ -246,7 +249,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                 <div key="particleContainer"
                     style={{ pointerEvents: "none", position: "absolute", left: 0, top: 0 }}>
                     <TransitionMotion key={"motion-anim"} defaultStyles={defaultStyles} styles={springStyles}>{
-                        (styles: EdgeStyle[]) =>
+                        (styles: MotionStyle[]) =>
                             <ParticleCanvas key="particles"
                                 width={diagramWidth}
                                 height={diagramHeight}
@@ -254,7 +257,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                 backgroundColor={backgroundColor}>
                                 {
                                     styles
-                                        .filter(edge => edge.data.ratePerSecond)
+                                        .filter(style => !style.data.isNode)
                                         .map(edgeStyle =>
                                             <ParticleEdge key={compKey(edgeStyle.data)}
                                                 {...edgeStyle.data}

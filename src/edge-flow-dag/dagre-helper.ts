@@ -35,13 +35,11 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeDagProp
         props => ({
             ...props,
             label: props.label,
-            width: 20,
-            height: 15,
             links: mapChild<IEdgeDagProps, IEdgeDagProps>(props.children, cc => cc)
         }) as NodeProps);
     const nodeDict = keyBy(nodes, n => n.id);
     for (let node of nodes) {
-        g.setNode(node.id, node);
+        g.setNode(node.id,  node);
         if (node.links) {
             for (let link of node.links) {
                 if (!nodeDict[link.linkTo]) continue;
@@ -64,7 +62,7 @@ export function getLayout(
     width: number,
     height: number): IPosNode[] {
     g.rankdir = "LR";
-    const forceLayout = layout.layout(g, { rankdir: "LR" }); 
+    const dagLayout = layout.layout(g, { rankdir: "LR" }); 
     const nodes: any[] = g.nodes();
     const posNodes = nodes.map(node => {
         const pt = g.node(node);
