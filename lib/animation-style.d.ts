@@ -4,6 +4,7 @@ import { Dictionary } from "lodash";
 import { INodeProps } from "./edge-flow/edge-flow-node";
 import { IEdgeProps } from "./edge-flow/edge-flow-edge";
 import { OpaqueConfig } from "react-motion";
+import { Scale } from "./edge-flow/scale";
 export interface EdgeStyleBase {
     key: string;
     data: EdgeAndNodeType & {
@@ -62,7 +63,7 @@ export declare function isNodeStyle(style: MotionStyle): style is NodeStyle;
 export declare function isEdgeStyle(style: MotionStyle): style is EdgeStyle;
 export declare function isEdgeStyles(styles: MotionStyle[]): EdgeStyle[];
 export declare function isNodeStyles(styles: MotionStyle[]): NodeStyle[];
-export declare function createEdgeStyle(edge: EdgeAndNodeType, nodeDict: Dictionary<INodeProps>, min: IPoint, max: IPoint, size: IPoint): EdgeStyle | EdgeDefaultStyle;
-export declare function createDefaultEdgeStyle(edge: EdgeAndNodeType, nodeDict: Dictionary<INodeProps>, min: IPoint, max: IPoint, size: IPoint): EdgeStyle | EdgeDefaultStyle;
-export declare function createNodeStyle(node: INodeProps, point: IPoint, min: IPoint, max: IPoint, size: IPoint): NodeStyle | NodeDefaultStyle;
-export declare function createDefaultNodeStyle(node: INodeProps, point: IPoint, min: IPoint, max: IPoint, size: IPoint): NodeStyle | NodeDefaultStyle;
+export declare function createEdgeStyle(edge: EdgeAndNodeType, nodeDict: Dictionary<INodeProps>, scale: Scale): EdgeStyle | EdgeDefaultStyle;
+export declare function createDefaultEdgeStyle(edge: EdgeAndNodeType, nodeDict: Dictionary<INodeProps>, scale: Scale): EdgeStyle | EdgeDefaultStyle;
+export declare function createNodeStyle(node: INodeProps, point: IPoint, scale: Scale): NodeStyle | NodeDefaultStyle;
+export declare function createDefaultNodeStyle(node: INodeProps, point: IPoint, scale: Scale): NodeStyle | NodeDefaultStyle;
