@@ -3,8 +3,8 @@ const graph = require("ngraph.graph");
 const layout = require('ngraph.forcelayout');
 import { keyBy } from "lodash";
 
-import { Edge, IEdgeForceProps } from "./force-edge";
-import { Node, INodeForceProps } from "./force-node";
+import { IEdgeForceProps } from "./force-edge";
+import { INodeForceProps } from "./force-node";
 
 export interface IPosNode {
     x: number;
@@ -38,12 +38,12 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeForcePr
 }
 
 function eachChild<T, X>(children, f: (child: T) => X) {
-    const childNodes= React.Children.map(children, (c: any) => c)||[];
+    const childNodes = React.Children.map(children, (c: any) => c) || [];
     const nonNull = childNodes.filter(c => !!c).map(c => c.props as T);
     return nonNull.map(f);
 }
 
-export function getLayout(g: any, childrenNodes: React.ReactElement<INodeForceProps>[], width: number, height: number)
+export function getLayout(g: any, childrenNodes: React.ReactElement<INodeForceProps>[])
     : IPosNode[] {
     const forceLayout = layout(g);
     eachChild<INodeForceProps, any>(childrenNodes, nodeProp => {
@@ -120,7 +120,7 @@ export function getPosition(layout: any, n: any/*, rect: any, blockWidth: number
     // const offsetX = rect.x1 * -1 + blockWidth * 0.5;
     // const offsetY = rect.y1 * -1 + blockWidth * 0.5;
     // const pos = 
-    return {id:n.id,...layout.getNodePosition(n.id)};
+    return { id: n.id, ...layout.getNodePosition(n.id) };
     // return {
     //     id: n.id,
     //     x: (pos.x + offsetX) * scaleX - (center ? 0 : blockWidth * 0.5),

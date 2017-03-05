@@ -1,4 +1,4 @@
-import Igloo, { Program, Buffer, Texture } from "igloo-ts";
+import Igloo, { Program } from "igloo-ts";
 const vertexShader = require("../../loader/raw-loader!../../shaders/vertex.glsl");
 const pixelShader = require("../../loader/raw-loader!../../shaders/pixel.glsl");
 import Color = require("color");
@@ -34,7 +34,7 @@ export default class Particles {
      * @param [size=5] particle size in pixels
      */
     constructor(private canvas: HTMLCanvasElement, private size: number = 8) {
-        const igloo = this.igloo = new Igloo(canvas);
+        const igloo = this.igloo = new Igloo(this.canvas);
         const vertexShaderText = vertexShader;
         const pixelShaderText = pixelShader;
 
@@ -66,7 +66,7 @@ export default class Particles {
             const edgeCount = edges.length;
             this.worldsize = new Float32Array([width, height]);
 
-            const scale = { x: width, y: height };
+            // const scale = { x: width, y: height };
             const convertBezierPoints = (edgePoint: IPoint, defaultPoint: IPoint) =>
                 edgePoint ? { x: edgePoint.x, y: edgePoint.y } : { x: defaultPoint.x, y: defaultPoint.y };
 
@@ -138,7 +138,7 @@ export default class Particles {
             this.program.uniform('shapeRow', (SHAPE_ROW + 0.5) / this.textureData.rowsPower2);
             this.program.uniform('bezierRow', (BEZIER_ROW + 0.5) / this.textureData.rowsPower2);
 
-            const edgeTexture = this.textureData.bindTexture(this.igloo.gl, gl.TEXTURE0);
+            this.textureData.bindTexture(this.igloo.gl, gl.TEXTURE0);
 
             this.program.uniform('edgeData', 0, true);
         }

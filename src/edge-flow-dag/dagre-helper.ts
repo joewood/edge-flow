@@ -3,8 +3,8 @@ const layout = require("ciena-dagre");
 const Graph = require("ciena-graphlib").Graph;
 import { keyBy } from "lodash";
 import { IPoint } from "../edge-flow/model"
-import { Edge, IEdgeDagProps } from "./dag-edge";
-import { Node, INodeDagProps } from "./dag-node";
+import { IEdgeDagProps } from "./dag-edge";
+import { INodeDagProps } from "./dag-node";
 import { mapChild } from "../common"
 
 export interface IPosEdge {
@@ -40,7 +40,7 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeDagProp
         }) as NodeProps);
     const nodeDict = keyBy(nodes, n => n.id);
     for (let node of nodes) {
-        g.setNode(node.id,  node);
+        g.setNode(node.id, node);
         if (node.links) {
             for (let link of node.links) {
                 if (!nodeDict[link.linkTo]) continue;
@@ -52,18 +52,14 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeDagProp
 }
 
 
-export function getLayout(
-    g: any,
-    childrenNodes: React.ReactElement<INodeDagProps>[],
-    width: number,
-    height: number): IPosNode[] {
+export function getLayout(g: any): IPosNode[] {
     g.rankdir = "LR";
-    const dagLayout = layout.layout(g, { rankdir: "LR" }); 
+    layout.layout(g, { rankdir: "LR" });
     const nodes: any[] = g.nodes();
     const posNodes = nodes.map(node => {
         const pt = g.node(node);
         if (!pt) {
-            console.error("Unknown Node ",node);
+            console.error("Unknown Node ", node);
             return null;
         }
         return { id: node, x: pt.x, y: pt.y, edges: [] };
@@ -81,7 +77,7 @@ export function getLayout(
                 p3: e.points.slice(-1)[0],
             });
         } else {
-            console.error("edge in layout has missing source node",edge);
+            console.error("edge in layout has missing source node", edge);
             debugger;
         }
     }

@@ -24,7 +24,7 @@ export default class TextureData {
         x: number;
         y: number;
     }): void;
-    setColor(row: number, index: number, color: string, alpha?: number): void;
+    setColor(row: number, index: number, color: string): void;
     getData(): Float32Array;
     bindTexture(gl: WebGLRenderingContext, register: number): WebGLTexture;
 }

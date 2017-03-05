@@ -1,5 +1,5 @@
 import * as React from "react"
-import { range } from "lodash";
+// import { range } from "lodash";
 import { EdgeFlow, Node, Edge } from ".."
 
 export interface IState {
@@ -23,11 +23,10 @@ export default class Partition extends React.Component<IProps, IState> {
         };
     }
 
-    componentWillReceiveProps(newProps: IProps) {
-        // const points = this.state.points.map((pt, i, arr) => circlePoint(i + newProps.animationIndex, arr.length));
-        // this.setState({ points: points });
-
-    }
+    // componentWillReceiveProps(newProps: IProps) {
+    //     // const points = this.state.points.map((pt, i, arr) => circlePoint(i + newProps.animationIndex, arr.length));
+    //     // this.setState({ points: points });
+    // }
 
     private inc = 0;
 
@@ -54,8 +53,8 @@ export default class Partition extends React.Component<IProps, IState> {
 
 
     render() {
-        const { animate, animationIndex, width, height} = this.props;
-        const inc = 1, x = 10, y = 10;
+        const { animate,  width, height} = this.props;
+        // const inc = 1, x = 10, y = 10;
         this.inc = 0;
         return <div key="root"
             style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black", height: height || 200, width: width || 200, overflow: "hidden" }}>

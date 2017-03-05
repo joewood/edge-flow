@@ -16,4 +16,4 @@ export interface IPosNode {
     edges: IPosEdge[];
 }
 export declare function getGraphFromNodes(childrenNodes: React.ReactElement<INodeDagProps>[]): any;
-export declare function getLayout(g: any, childrenNodes: React.ReactElement<INodeDagProps>[], width: number, height: number): IPosNode[];
+export declare function getLayout(g: any): IPosNode[];

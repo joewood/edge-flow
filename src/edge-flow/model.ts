@@ -1,5 +1,3 @@
-import * as React from "react";
-
 export interface IPositionlessNode {
     symbol?: string;
     symbolColor?: string;

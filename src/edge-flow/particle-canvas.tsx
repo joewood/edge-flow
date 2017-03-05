@@ -35,7 +35,7 @@ export class ParticleCanvas extends React.PureComponent<IProps, any> {
         if (props.run) this.particles.start();
     }
 
-    private componentWillReceiveProps(newProps: IProps) {
+    public componentWillReceiveProps(newProps: IProps) {
         if (!!this.particles) {
             if (this.props.children !== newProps.children || this.props.width != newProps.width || this.props.height != newProps.height) {
                 this.setupParticles(newProps);
@@ -49,7 +49,7 @@ export class ParticleCanvas extends React.PureComponent<IProps, any> {
         }
     }
 
-    public shouldComponentUpdate(newProps: IProps, newState: any) {
+    public shouldComponentUpdate(newProps: IProps/*, newState: any*/) {
         // if just run changes then don't update
         if (newProps.children == this.props.children &&
             newProps.backgroundColor === this.props.backgroundColor &&
@@ -58,7 +58,7 @@ export class ParticleCanvas extends React.PureComponent<IProps, any> {
         return true;
     }
 
-    private componentWillUnmount() {
+    public componentWillUnmount() {
         if (!!this.particles) {
             this.particles.stop();
         }
@@ -66,7 +66,7 @@ export class ParticleCanvas extends React.PureComponent<IProps, any> {
 
     public render() {
         const { width, height} = this.props;
-        const running = this.particles && this.particles.isRunning;
+        // const running = this.particles && this.particles.isRunning;
         return (
             <canvas key="canva"
                 style={{ pointerEvents: "none" }}

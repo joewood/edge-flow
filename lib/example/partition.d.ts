@@ -10,7 +10,6 @@ export interface IProps {
 }
 export default class Partition extends React.Component<IProps, IState> {
     constructor(p: any);
-    componentWillReceiveProps(newProps: IProps): void;
     private inc;
     getPartition(x: number, y: number): JSX.Element[];
     render(): JSX.Element;

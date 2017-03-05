@@ -1,6 +1,6 @@
 import * as React from "react"
 import * as ReactDOM from 'react-dom'
-import { range } from "lodash";
+// import { range } from "lodash";
 import Swirl from "./swirl";
 import Partition from "./partition"
 import Network from "./network"
@@ -17,7 +17,7 @@ interface IState {
 }
 
 class App extends React.Component<any, IState> {
-    private resizeHandler: EventListenerOrEventListenerObject;
+    // private resizeHandler: EventListenerOrEventListenerObject;
     private div: HTMLDivElement;
     private timer: number;
 
@@ -37,13 +37,13 @@ class App extends React.Component<any, IState> {
         this.setState({ width: document.getElementById("root").clientWidth, height: document.getElementById("root").clientHeight });
     }
 
-    private componentDidMount() {
+    public componentDidMount() {
         this.timer = window.setInterval(this.moveNext, 2000)
         window.addEventListener("resize", this.onResize);
         this.setState({ width: document.getElementById("root").clientWidth, height: document.getElementById("root").clientHeight - 20 });
     }
 
-    private componentWillUnmount() {
+    public componentWillUnmount() {
         window.clearInterval(this.timer);
         window.removeEventListener("resize", this.onResize);
     }

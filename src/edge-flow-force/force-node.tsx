@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { INode, IEdge} from "./model";
+import { INode} from "./model";
 import { Edge, IEdgeForceProps } from "./force-edge";
 
 export interface INodeForceProps extends INode {

@@ -23,30 +23,24 @@ function circlePoint(i: number, length: number) {
     };
 }
 
-function segment(p: number): string {
-    return p < radius ? "0" : "1";
-}
-
 export default class Swirl extends React.Component<IProps, IState> {
 
     constructor(p: any) {
         super(p);
         this.state = {
-            points: range(0, 24).map((pt, i, arr) => circlePoint(i, arr.length)),
+            points: range(0, 24).map((pt, i, arr) => (pt && circlePoint(i, arr.length))),
         };
     }
 
     componentWillReceiveProps(newProps: IProps) {
-        const points = this.state.points.map((pt, i, arr) => circlePoint(i + newProps.animationIndex, arr.length));
+        const points = this.state.points.map((pt, i, arr) => circlePoint(i + (pt && newProps.animationIndex), arr.length));
         this.setState({ points: points });
 
     }
 
-
-
     render() {
-        const { points} = this.state;
-        const { animate, animationIndex, width, height} = this.props;
+        const { points } = this.state;
+        const { animate, width, height } = this.props;
         const numPoints = points.length;
         return <div key="root"
             style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black", height: height, width: width, overflow: "hidden" }}>

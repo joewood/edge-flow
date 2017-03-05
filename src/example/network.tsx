@@ -1,5 +1,5 @@
 import * as React from "react"
-import { range } from "lodash";
+// import { range } from "lodash";
 import { EdgeFlowDag, NodeDag, EdgeDag } from ".."
 
 export interface IState {
@@ -25,7 +25,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
 
     private interval1: any;
 
-    private invcFlow = () => {
+    public invcFlow = () => {
         this.setState({ flow: (this.state.flow + 2) % 100 });
     }
 
@@ -34,7 +34,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
     }
 
     public componentWillUnmounnt() {
-        // clearInterval(this.interval1);
+        if (this.interval1) clearInterval(this.interval1);
     }
 
     private addNode = () => {
@@ -44,7 +44,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
     render() {
         console.log("Rendering network")
         const { animate, width, height } = this.props;
-        const inc = 1, x = 10, y = 10;
+        // const inc = 1, x = 10, y = 10;
         const nodeStyle = { symbol: "\uf109", symbolColor: "white", symbolSize: 35, width: 10, height: 10 };
         const topicNode = { symbol: "\u2225", symbolColor: "white", symbolSize: 50, width: 2, height: 10 };
         const edgeStyle = { nonrandom:true, ratePerSecond:  (this.state.flow), variationMax: 0.05, variationMin: -0.05, size: 10, shape: 0.65, color: "#ffff90", endingColor: "rgb(128,128,255)" };
@@ -80,8 +80,8 @@ export default class Partition extends React.PureComponent<IProps, IState> {
                     <NodeDag key="connector13" id="connector13" {...topicNode}>
                         {[
                             ...this.state.nodes
-                                .filter((n, i) => (i % 2) == 1)
-                                .map((n, i) => <EdgeDag linkTo={"node" + i} key={"node" + i} {...edgeStyle} />),
+                                .filter((n, i) => ((n && i) % 2) == 1)
+                                .map((n, i) => <EdgeDag linkTo={ n && "node" + i} key={"node" + i} {...edgeStyle} />),
                             <EdgeDag key="21E" linkTo="connector23" {...edgeStyle} />
                         ]}
                     </NodeDag>,
@@ -91,7 +91,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
                     </NodeDag>,
                     <NodeDag key="target" id="target" {...nodeStyle}>
                     </NodeDag>,
-                    ...this.state.nodes.map((n, i) => <NodeDag key={"node" + i} id={"node" + i} {...topicNode}>
+                    ...this.state.nodes.map((n, i) => <NodeDag key={n && "node" + i} id={"node" + i} {...topicNode}>
                         <EdgeDag linkTo={(i % 2) ? "target" : "connector23"} {...edgeStyle} />
                     </NodeDag>)
                 ]}

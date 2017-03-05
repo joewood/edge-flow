@@ -14,6 +14,6 @@ export interface IState {
 export declare class EdgeFlowForce extends React.Component<IProps, IState> {
     constructor(p: IProps);
     private getStateFromProps(newProps);
-    private componentWillReceiveProps(newProps);
+    componentWillReceiveProps(newProps: IProps): void;
     render(): JSX.Element;
 }

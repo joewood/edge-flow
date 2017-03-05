@@ -1,8 +1,8 @@
 import { IPoint } from "./edge-flow/model";
-import { maxBy, minBy, flatten, values, keyBy, Dictionary } from "lodash";
-import { Node, INodeProps } from "./edge-flow/edge-flow-node";
-import { Edge, IEdgeProps } from "./edge-flow/edge-flow-edge";
-import { TransitionMotion, OpaqueConfig, spring } from "react-motion";
+import { Dictionary } from "lodash";
+import { INodeProps } from "./edge-flow/edge-flow-node";
+import { IEdgeProps } from "./edge-flow/edge-flow-edge";
+import { OpaqueConfig, spring } from "react-motion";
 
 const scaleX = (x: number, min: IPoint, max: IPoint, diagramWidth: number) => Math.round(((x - min.x) + (max.x - min.x) * 0.08) / ((max.x - min.x) * 1.16) * diagramWidth * 10) / 10;
 const scaleY = (y: number, min: IPoint, max: IPoint, diagramHeight: number) => Math.round(((y - min.y) + (max.y - min.y) * 0.08) / ((max.y - min.y) * 1.16) * diagramHeight * 10) / 10;

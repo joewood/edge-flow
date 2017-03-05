@@ -15,8 +15,8 @@ export declare class ParticleCanvas extends React.PureComponent<IProps, any> {
     private canvas;
     private particles;
     private setupParticles(props);
-    private componentWillReceiveProps(newProps);
-    shouldComponentUpdate(newProps: IProps, newState: any): boolean;
-    private componentWillUnmount();
+    componentWillReceiveProps(newProps: IProps): void;
+    shouldComponentUpdate(newProps: IProps): boolean;
+    componentWillUnmount(): void;
     render(): JSX.Element;
 }

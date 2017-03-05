@@ -14,7 +14,7 @@ export interface IProps {
 export default class Partition extends React.PureComponent<IProps, IState> {
     constructor(p: any);
     private interval1;
-    private invcFlow;
+    invcFlow: () => void;
     componentDidMount(): void;
     componentWillUnmounnt(): void;
     private addNode;

@@ -1,4 +1,4 @@
-import Igloo, { Program, Buffer, Texture } from "igloo-ts";
+// import Igloo, { Program, Buffer, Texture } from "igloo-ts";
 import Color = require("color");
 
 export default class TextureData {
@@ -8,7 +8,7 @@ export default class TextureData {
     private texture: WebGLTexture;
 
     constructor(private rows: number, public length: number) {
-        this.rowsPower2 = 2 ** Math.ceil(Math.log2(rows));
+        this.rowsPower2 = 2 ** Math.ceil(Math.log2(this.rows));
         this.lengthPower2 = 2 ** Math.ceil(Math.log2(length));
         this.data = new Float32Array(this.rowsPower2 * this.lengthPower2 * 4)
     }
@@ -38,7 +38,7 @@ export default class TextureData {
     }
 
 
-    public setColor(row: number, index: number, color: string, alpha = 1.0): void {
+    public setColor(row: number, index: number, color: string): void {
         const colorObj = Color(color);
         const colorarray = colorObj.array();
         this.setValue(row, index, colorarray[0] / 256, colorarray[1] / 256, colorarray[2] / 256, colorObj.alpha());
@@ -63,7 +63,7 @@ export default class TextureData {
 
         gl.activeTexture(register); // working register 31, thanks.
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        // gl.activeTexture(oldActive);
+        gl.activeTexture(oldActive);
         return this.texture;
     }
 

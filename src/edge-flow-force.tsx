@@ -3,21 +3,17 @@
  * */
 
 import * as React from "react";
-import { groupBy, maxBy, minBy, flatten, values, keyBy, Dictionary } from "lodash";
-import Color = require("color");
+import { groupBy, keyBy } from "lodash";
 
 
-import { EdgeFlow, Edge, Node, NodeClickEventArgs, IBaseProps } from "./edge-flow"
+import { EdgeFlow, Edge, Node,  IBaseProps } from "./edge-flow"
 import { Edge as EdgeForce, IEdgeForceProps } from "./edge-flow-force/force-edge";
 import { Node as NodeForce, INodeForceProps } from "./edge-flow-force/force-node";
 import { getChildrenProps} from "./common"
 
 export { EdgeForce, IEdgeForceProps, NodeForce, INodeForceProps };
 
-import {
-    getPosition, getGraphFromNodes, getLayout, mapNodes,
-    mapLinks, IPosNode
-} from "./edge-flow-force/ngraph-helper"
+import { getGraphFromNodes, getLayout,  IPosNode} from "./edge-flow-force/ngraph-helper"
 
 
 export interface IProps extends IBaseProps {
@@ -28,15 +24,15 @@ export interface IState {
     nodes?: IPosNode[];
 }
 
-const styles = {
-    container: {
-        position: "relative",
-        display: "inline-block",
-        verticalAlign: "top",
-        padding: 0,
-        margin: 0
-    } as React.CSSProperties
-}
+// const styles = {
+//     container: {
+//         position: "relative",
+//         display: "inline-block",
+//         verticalAlign: "top",
+//         padding: 0,
+//         margin: 0
+//     } as React.CSSProperties
+// }
 
 export class EdgeFlowForce extends React.Component<IProps, IState> {
 
@@ -47,10 +43,10 @@ export class EdgeFlowForce extends React.Component<IProps, IState> {
 
     private getStateFromProps(newProps: IProps): IPosNode[] {
         const graph = getGraphFromNodes(newProps.children as any);
-        return getLayout(graph, newProps.children as any, newProps.style.width, newProps.style.height);
+        return getLayout(graph, newProps.children as any);
     }
 
-    private componentWillReceiveProps(newProps: IProps) {
+    public componentWillReceiveProps(newProps: IProps) {
         this.setState({nodes:this.getStateFromProps(newProps)});
     }
 
@@ -59,7 +55,7 @@ export class EdgeFlowForce extends React.Component<IProps, IState> {
         const posNodes = keyBy(state.nodes, n => n.id);
         const {children, ...props} = this.props;
         const nodes = getChildrenProps<INodeForceProps>(children) || [];
-        const nodeDict = keyBy(nodes, n => n.id);
+        // const nodeDict = keyBy(nodes, n => n.id);
         type EdgeAndNodeType = IEdgeForceProps & { fromForceNode: string };
         const allEdges = nodes.reduce((p, node) => [
             ...p,

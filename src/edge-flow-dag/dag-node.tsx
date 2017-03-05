@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { INode, IEdge} from "./model";
+import { INode } from "./model";
 import { Edge, IEdgeDagProps } from "./dag-edge";
 
 export interface INodeDagProps extends INode {

@@ -3,22 +3,22 @@
  * */
 
 import * as React from "react";
-import { maxBy, minBy, flatten, values, keyBy, Dictionary } from "lodash";
-import { TransitionMotion, spring as _Spring } from "react-motion";
+import { maxBy, minBy, keyBy } from "lodash";
+import { TransitionMotion } from "react-motion";
 import Color = require("color");
 
 import { WrappedSvgText } from "./edge-flow/svg-components"
 import { ParticleCanvas, ParticleEdge } from "./edge-flow/particle-canvas";
 import { Edge, IEdgeProps } from "./edge-flow/edge-flow-edge";
 import { Node, INodeProps } from "./edge-flow/edge-flow-node";
-import { IPoint } from "./edge-flow/model";
+// import { IPoint } from "./edge-flow/model";
 import { getChildrenProps } from "./common"
-import { EdgeStyle, NodeStyle, EdgeAndNodeType, MotionStyle, createDefaultEdgeStyle, createDefaultNodeStyle, createEdgeStyle, createNodeStyle, isEdgeStyle, isNodeStyle, isNodeStyles, isEdgeStyles } from "./animation-style"
+import { EdgeStyle, EdgeAndNodeType, MotionStyle, createDefaultEdgeStyle, createDefaultNodeStyle, createEdgeStyle, createNodeStyle, isNodeStyles, isEdgeStyles } from "./animation-style"
 
 export { Edge, IEdgeProps, Node, INodeProps, };
 
 // const oldSpring = _Spring;
-const spring = _Spring; //(v: number) => oldSpring(v, { damping: 10, stiffness: 80 });
+// const spring = _Spring; //(v: number) => oldSpring(v, { damping: 10, stiffness: 80 });
 
 export interface NodeClickEventArgs {
     nodeId: string;
@@ -75,7 +75,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
             throw "Error Nodes";
         }
         const nodeDict = keyBy(nodes, n => n.id);
-        const { run, children, style, onClickNode, selectedNodeId } = this.props;
+        const { run, style, onClickNode, selectedNodeId } = this.props;
         const { backgroundColor, width, height } = style;
         if (!width || isNaN(width) || !height || isNaN(height)) {
             throw "Invalid Height/Width";
