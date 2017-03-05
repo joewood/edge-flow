@@ -62,7 +62,7 @@ export default class Particles {
     public updateBuffers(edges: IParticleEdge[], width: number, height: number) {
         try {
             const gl = this.igloo.gl;
-            const particleCount = edges.reduce((p, c) => c.ratePerSecond + p, 0);
+            const particleCount = edges.reduce((p, c) => (c.ratePerSecond || 0) + p, 0);
             const edgeCount = edges.length;
             this.worldsize = new Float32Array([width, height]);
 
@@ -80,6 +80,10 @@ export default class Particles {
                 const timeOffsetArray = new Float32Array(particleCount);
                 let edgeIndex = 0;
                 for (let edge of edges) {
+                    if (!edge.ratePerSecond) {
+                        edgeIndex++;
+                        continue;
+                    }
                     for (let n = 0; n < edge.ratePerSecond; n++) {
                         timeOffsetArray[i] = edge.nonrandom ? (n / edge.ratePerSecond) : Math.random();
                         edgeIndexArray[i] = edgeIndex;
@@ -120,8 +124,8 @@ export default class Particles {
                 this.textureData.setValue(SHAPE_ROW, edgeIndex, (edge.size || this.size || 8.0) / 256, edge.shape || 0.0, 0.0, 0.0);
                 // bezier
                 this.textureData.setVec2(BEZIER_ROW, edgeIndex,
-                    convertBezierPoints(edge.p1, edge.p1),//{ x: edge.fromX, y: edge.fromY }),
-                    convertBezierPoints(edge.p2, edge.p2));//{ x: edge.toX, y: edge.toY }));
+                    convertBezierPoints(edge.p1, edge.p1),
+                    convertBezierPoints(edge.p2, edge.p2));
                 edgeIndex++;
             }
             this.program.use();
@@ -164,7 +168,7 @@ export default class Particles {
 
         const background = Color(this.color).array();
         this.program.uniform('color', [background[0] / 255, background[1] / 255, background[2] / 255, 1.0]);
-        this.program.draw(gl.POINTS, this.count);
+        if (this.count > 0) this.program.draw(gl.POINTS, this.count);
         return this;
     };
 

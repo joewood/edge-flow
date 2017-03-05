@@ -10,6 +10,7 @@ import Color = require("color");
 import { EdgeFlow, Edge, Node, NodeClickEventArgs, IBaseProps } from "./edge-flow"
 import { Edge as EdgeForce, IEdgeForceProps } from "./edge-flow-force/force-edge";
 import { Node as NodeForce, INodeForceProps } from "./edge-flow-force/force-node";
+import { getChildrenProps} from "./common"
 
 export { EdgeForce, IEdgeForceProps, NodeForce, INodeForceProps };
 
@@ -35,11 +36,6 @@ const styles = {
         padding: 0,
         margin: 0
     } as React.CSSProperties
-}
-
-/** Helper function, return the props of a children element */
-function getChildrenProps<T>(children: React.ReactNode): T[] {
-    return React.Children.map<T>(children, child => (child as any).props) || [];
 }
 
 export class EdgeFlowForce extends React.Component<IProps, IState> {

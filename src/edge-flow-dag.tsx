@@ -11,9 +11,10 @@ import { Edge as EdgeDag, IEdgeDagProps } from "./edge-flow-dag/dag-edge";
 import { Node as NodeDag, INodeDagProps } from "./edge-flow-dag/dag-node";
 
 export { EdgeDag, IEdgeDagProps, NodeDag, INodeDagProps };
+import * as equals from "equals";
 
 import { getGraphFromNodes, getLayout, IPosNode } from "./edge-flow-dag/dagre-helper"
-
+import { getChildrenProps, mapChild } from "./common";
 
 export interface IProps extends IBaseProps {
     children?: NodeDag[];
@@ -33,21 +34,35 @@ const styles = {
     } as React.CSSProperties
 }
 
-/** Helper function, return the props of a children element */
-function getChildrenProps<T>(children: React.ReactNode): T[] {
-    return React.Children.map<T>(children, child => (child as any).props) || [];
-}
 
 export class EdgeFlowDag extends React.PureComponent<IProps, IState> {
 
     constructor(p: IProps) {
         super(p);
-        this.state = { nodes: this.getStateFromProps(p) };
+        this.state = { nodes: this.getStateFromProps(p,true) };
     }
 
-    private getStateFromProps(newProps: IProps): IPosNode[] {
-        const graph = getGraphFromNodes(newProps.children as any);
-        return getLayout(graph, newProps.children as any, newProps.style.width, newProps.style.height);
+    private getStateFromProps(newProps: IProps,force=false): IPosNode[] {
+        // for new props, we only want to calc the dag if the structure has changed
+        type TrackChangesType = { width: number, height: number, links: { linkTo: string }[] };
+        const newState = mapChild<INodeDagProps, TrackChangesType>(newProps.children,
+            props => ({
+                width: props.width,
+                height: props.height,
+                links: mapChild<IEdgeDagProps, { linkTo: string }>(props.children, ({linkTo}) => ({ linkTo }))
+            }));
+        const oldState = mapChild<INodeDagProps, TrackChangesType>(this.props.children,
+            props => ({
+                width: props.width,
+                height: props.height,
+                links: mapChild<IEdgeDagProps, { linkTo: string }>(props.children, ({linkTo}) => ({ linkTo }))
+            }));
+        if (force || !equals(newState, oldState)) {
+            const graph = getGraphFromNodes(newProps.children as any);
+            return getLayout(graph, newProps.children as any, newProps.style.width, newProps.style.height);
+        } else {
+            return this.state.nodes;
+        }
     }
 
     private componentWillReceiveProps(newProps: IProps) {

@@ -4,6 +4,7 @@ export interface IState {
     nodes: {
         name: string;
     }[];
+    flow: number;
 }
 export interface IProps {
     width: number;
@@ -12,7 +13,10 @@ export interface IProps {
 }
 export default class Partition extends React.PureComponent<IProps, IState> {
     constructor(p: any);
-    componentWillReceiveProps(newProps: IProps): void;
+    private interval1;
+    private invcFlow;
+    componentDidMount(): void;
+    componentWillUnmounnt(): void;
     private addNode;
     render(): JSX.Element;
 }

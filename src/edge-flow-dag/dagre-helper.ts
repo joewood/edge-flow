@@ -5,6 +5,7 @@ import { keyBy } from "lodash";
 import { IPoint } from "../edge-flow/model"
 import { Edge, IEdgeDagProps } from "./dag-edge";
 import { Node, INodeDagProps } from "./dag-node";
+import { mapChild } from "../common"
 
 export interface IPosEdge {
     linkTo: string;
@@ -50,11 +51,6 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeDagProp
     return g;
 }
 
-function mapChild<T, X>(children, f: (child: T) => X) {
-    const childNodes = React.Children.map(children, (c: any) => c) || [];
-    const nonNull = childNodes.filter(c => !!c).map(c => c.props as T);
-    return nonNull.map(f);
-}
 
 export function getLayout(
     g: any,

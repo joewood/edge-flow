@@ -13,7 +13,7 @@ export interface IState {
 }
 export declare class EdgeFlowDag extends React.PureComponent<IProps, IState> {
     constructor(p: IProps);
-    private getStateFromProps(newProps);
+    private getStateFromProps(newProps, force?);
     private componentWillReceiveProps(newProps);
     render(): JSX.Element;
 }

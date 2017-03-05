@@ -4,6 +4,7 @@ import { EdgeFlowDag, NodeDag, EdgeDag } from ".."
 
 export interface IState {
     nodes: { name: string }[];
+    flow: number;
 }
 
 export interface IProps {
@@ -17,11 +18,23 @@ export default class Partition extends React.PureComponent<IProps, IState> {
     constructor(p: any) {
         super(p);
         this.state = {
-            nodes: []
+            nodes: [],
+            flow: 10,
         };
     }
 
-    componentWillReceiveProps(newProps: IProps) {
+    private interval1: any;
+
+    private invcFlow = () => {
+        this.setState({ flow: (this.state.flow + 2) % 100 });
+    }
+
+    public componentDidMount() {
+        // this.interval1 = setInterval(this.invcFlow, 1000) ;
+    }
+
+    public componentWillUnmounnt() {
+        // clearInterval(this.interval1);
     }
 
     private addNode = () => {
@@ -30,11 +43,11 @@ export default class Partition extends React.PureComponent<IProps, IState> {
 
     render() {
         console.log("Rendering network")
-        const { animate, width, height} = this.props;
+        const { animate, width, height } = this.props;
         const inc = 1, x = 10, y = 10;
         const nodeStyle = { symbol: "\uf109", symbolColor: "white", symbolSize: 35, width: 10, height: 10 };
         const topicNode = { symbol: "\u2225", symbolColor: "white", symbolSize: 50, width: 2, height: 10 };
-        const edgeStyle = { ratePerSecond: 10, variationMax: 0.05, variationMin: -0.05, size: 10, shape: 0.65, color: "#ffff90", endingColor: "rgb(128,128,255)" };
+        const edgeStyle = { nonrandom:true, ratePerSecond:  (this.state.flow), variationMax: 0.05, variationMin: -0.05, size: 10, shape: 0.65, color: "#ffff90", endingColor: "rgb(128,128,255)" };
         return <div key="root"
             style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black", height: height || 200, width: width || 200, overflow: "hidden" }}>
             <div key="tool" style={{ position: "absolute", right: 5, top: 5 }}>
