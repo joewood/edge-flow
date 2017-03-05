@@ -2,7 +2,7 @@ import * as React from "react";
 const layout = require("ciena-dagre");
 const Graph = require("ciena-graphlib").Graph;
 import { keyBy } from "lodash";
-import { IPoint } from "../edge-flow/model"
+import { IPoint } from "../model"
 import { IEdgeDagProps } from "./dag-edge";
 import { INodeDagProps } from "./dag-node";
 import { mapChild } from "../common"

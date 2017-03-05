@@ -1,10 +1,10 @@
 /// <reference types="lodash" />
-import { IPoint } from "./edge-flow/model";
 import { Dictionary } from "lodash";
-import { INodeProps } from "./edge-flow/edge-flow-node";
-import { IEdgeProps } from "./edge-flow/edge-flow-edge";
+import { IPoint } from "./model";
+import { INodeProps } from "./edge-flow-node";
+import { IEdgeProps } from "./edge-flow-edge";
 import { OpaqueConfig } from "react-motion";
-import { Scale } from "./edge-flow/scale";
+import { Scale } from "./scale";
 export interface EdgeStyleBase {
     key: string;
     data: EdgeAndNodeType & {

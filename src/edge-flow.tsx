@@ -7,14 +7,13 @@ import { maxBy, minBy, keyBy } from "lodash";
 import { TransitionMotion } from "react-motion";
 import Color = require("color");
 
-import { WrappedSvgText } from "./edge-flow/svg-components"
-import { ParticleCanvas, ParticleEdge } from "./edge-flow/particle-canvas";
-import { Edge, IEdgeProps } from "./edge-flow/edge-flow-edge";
-import { Node, INodeProps } from "./edge-flow/edge-flow-node";
-// import { IPoint } from "./edge-flow/model";
+import { WrappedSvgText } from "./svg/svg-components"
+import { ParticleCanvas, ParticleEdge } from "./particles/particle-canvas";
+import { Edge, IEdgeProps } from "./edge-flow-edge";
+import { Node, INodeProps } from "./edge-flow-node";
 import { getChildrenProps } from "./common"
 import { EdgeStyle, EdgeAndNodeType, MotionStyle, createDefaultEdgeStyle, createDefaultNodeStyle, createEdgeStyle, createNodeStyle, isNodeStyles, isEdgeStyles } from "./animation-style"
-import { Scale } from "./edge-flow/scale"
+import { Scale } from "./scale"
 
 export { Edge, IEdgeProps, Node, INodeProps, };
 
@@ -56,8 +55,6 @@ const styles = {
         margin: 0
     } as React.CSSProperties
 }
-
-
 
 
 export class EdgeFlow extends React.Component<IProps, IState> {

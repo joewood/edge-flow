@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import * as React from "react";
-import { IPoint } from "../edge-flow/model";
+import { IPoint } from "../model";
 import { INodeDagProps } from "./dag-node";
 export interface IPosEdge {
     linkTo: string;

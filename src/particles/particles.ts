@@ -3,7 +3,7 @@ const vertexShader = require("../../loader/raw-loader!../../shaders/vertex.glsl"
 const pixelShader = require("../../loader/raw-loader!../../shaders/pixel.glsl");
 import Color = require("color");
 import TextureData from "./texture-data";
-import { IEdge as IModelEdge, IPoint } from "./model"
+import { IEdge as IModelEdge, IPoint } from "../model"
 
 export interface IParticleEdge extends IModelEdge {
 }

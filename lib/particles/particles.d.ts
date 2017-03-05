@@ -1,4 +1,4 @@
-import { IEdge as IModelEdge } from "./model";
+import { IEdge as IModelEdge } from "../model";
 export interface IParticleEdge extends IModelEdge {
 }
 export default class Particles {

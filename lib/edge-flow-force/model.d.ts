@@ -1,4 +1,4 @@
-import * as BaseModel from '../edge-flow/model';
+import * as BaseModel from '../model';
 export interface INode extends BaseModel.IPositionlessNode {
     center?: {
         x: number;
