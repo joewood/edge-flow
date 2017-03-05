@@ -46,8 +46,13 @@ export class Scale {
         return this.scaleToScreen.x * width;
     }
 
-    public sizeToScreen(size: number): number {
+    public avgSizeToScreen(size: number): number {
         return (this.scaleToScreen.x + this.scaleToScreen.y) / 2.0 * size;
     }
+
+    public smallestSizeToScreen(size: number): number {
+        return Math.min(this.scaleToScreen.x * size, this.scaleToScreen.y * size);
+    }
+
 
 }

@@ -16,6 +16,7 @@ export interface IProps {
 const radius = 200;
 
 function circlePoint(i: number, length: number) {
+    console.log("Circle " + i + " " + length);
     const angle = (i % length) / length * 2 * Math.PI;
     return {
         x: radius + radius * Math.cos(angle),
@@ -28,7 +29,7 @@ export default class Swirl extends React.Component<IProps, IState> {
     constructor(p: any) {
         super(p);
         this.state = {
-            points: range(0, 24).map((pt, i, arr) => (pt && circlePoint(i, arr.length))),
+            points: range(0, 24).map((_pt, i) => circlePoint(i, 24)),
         };
     }
 
@@ -48,12 +49,23 @@ export default class Swirl extends React.Component<IProps, IState> {
                 {
                     [...points.map((p, i) =>
                         <Node key={"node" + i} id={"node" + i} label={i.toString()} center={{ x: p.x, y: p.y }} labelColor="white" >
-                            <Edge linkTo={"node" + (i + 1) % numPoints} ratePerSecond={7} variationMin={-0.1} variationMax={0.1}
-                                size={5.0} shape={0.0} pathOpacity={0.05}
+                            <Edge linkTo={"node" + (i + 1) % numPoints}
+                                ratePerSecond={7}
+                                variationMin={-0.1}
+                                variationMax={0.1}
+                                size={5.0}
+                                shape={0.0}
+                                pathOpacity={0.05}
                                 color={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`}
                                 pathColor={`rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`} />
-                            <Edge linkTo={"nodep-" + Math.floor(i / points.length * 4)} ratePerSecond={10} color="#e0ffe0" size={8}
-                                shape={1.0} pathWidth={3} pathOpacity={0.001} nonrandom
+                            <Edge linkTo={"nodep-" + Math.floor(i / points.length * 4)}
+                                ratePerSecond={10}
+                                color="#e0ffe0"
+                                size={8}
+                                shape={1.0}
+                                pathWidth={3}
+                                pathOpacity={0.001}
+                                nonrandom
                                 p0={{ x: p.x, y: p.y }}
                                 p1={{ x: p.x + 10.0, y: p.y + 10.0 }}
                                 p2={{ x: radius + 40, y: radius + 40 }}
@@ -62,9 +74,9 @@ export default class Swirl extends React.Component<IProps, IState> {
                             />
                         </Node>),
                     <Node key="nodep-0" id="nodep-0" center={{ x: radius + radius / 8, y: radius + radius / 8 }} group />,
-                    <Node key="nodep-0" id="nodep-0" center={{ x: radius - radius / 8, y: radius + radius / 8 }} group />,
-                    <Node key="nodep-0" id="nodep-0" center={{ x: radius - radius / 8, y: radius - radius / 8 }} group />,
-                    <Node key="nodep-0" id="nodep-0" center={{ x: radius + radius / 8, y: radius - radius / 8 }} group />,
+                    <Node key="nodep-1" id="nodep-1" center={{ x: radius - radius / 8, y: radius + radius / 8 }} group />,
+                    <Node key="nodep-2" id="nodep-2" center={{ x: radius - radius / 8, y: radius - radius / 8 }} group />,
+                    <Node key="nodep-3" id="nodep-3" center={{ x: radius + radius / 8, y: radius - radius / 8 }} group />,
                     ]
                 }
             </EdgeFlow>

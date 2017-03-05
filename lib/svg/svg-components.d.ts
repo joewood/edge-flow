@@ -16,4 +16,6 @@ export declare const WrappedSvgText: (props: {
     fontFamily?: string;
     fontWeight?: number;
     textColor?: string;
+    glow?: boolean;
+    top?: boolean;
 }) => JSX.Element;

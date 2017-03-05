@@ -5,6 +5,7 @@ export interface IState {
         name: string;
     }[];
     flow: number;
+    selectedNode: string;
 }
 export interface IProps {
     width: number;
@@ -18,5 +19,6 @@ export default class Partition extends React.PureComponent<IProps, IState> {
     componentDidMount(): void;
     componentWillUnmounnt(): void;
     private addNode;
+    private selectNode;
     render(): JSX.Element;
 }

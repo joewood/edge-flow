@@ -92,7 +92,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
         const max = { x: maxBy(nodes, n => n.center.x).center.x, y: maxBy(nodes, n => n.center.y).center.y };
         const min = { x: minBy(nodes, n => n.center.x).center.x, y: minBy(nodes, n => n.center.y).center.y };
 
-        const scale = new Scale(min, max, size, { width: 20, height: 20 });
+        const scale = new Scale(min, max, size, { width: 10, height: 30 });
 
         const allEdges = nodes.reduce((p, node: INodeProps) => [
             ...p,
@@ -117,7 +117,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                         stroke={edge.pathColor || defaulltStrokeColor}
                         opacity={edge.pathOpacity || 0.05}
                         fill="transparent"
-                        strokeWidth={scale.sizeToScreen(edge.pathWidth || 4)}
+                        strokeWidth={scale.avgSizeToScreen(edge.pathWidth || 4)}
                     />;
                 });
         };
@@ -135,7 +135,19 @@ export class EdgeFlow extends React.Component<IProps, IState> {
         return (
             <div key="root" style={composedStyle} >
                 <svg key="svg" width={width} height={height} style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
-                    onClick={() => onClickNode({ nodeId: null, graph: null, screen: null })}>
+                    onClick={() => onClickNode && onClickNode({ nodeId: null, graph: null, screen: null })}>
+                    <defs>
+                        <filter id="glow">
+                            <feFlood result="flood" floodColor="#ffffff" floodOpacity="1"></feFlood>
+                            <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
+                            <feMorphology in="mask" result="dilated" operator="dilate" radius="1.3"></feMorphology>
+                            <feGaussianBlur in="dilated" result="blurred" stdDeviation="2"></feGaussianBlur>
+                            <feMerge>
+                                <feMergeNode in="blurred"></feMergeNode>
+                                <feMergeNode in="SourceGraphic"></feMergeNode>
+                            </feMerge>
+                        </filter>
+                    </defs>
                     <TransitionMotion key="svg-anim" defaultStyles={defaultStyles} styles={springStyles}>{
                         (styles: MotionStyle[]) =>
                             <g key="g">{[
@@ -144,36 +156,44 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                     .filter(style => style.data.label)
                                     .map(nodeStyle =>
                                         <WrappedSvgText key={"TEXT-" + nodeStyle.key}
-                                            x={nodeStyle.style.x - 25}
-                                            y={nodeStyle.style.y+ 14}
-                                            height={scale.heightToScreen(40)}
-                                            width={scale.widthToScreen(50)}
+                                            x={nodeStyle.style.x}
+                                            y={nodeStyle.style.y + scale.heightToScreen(nodeStyle.data.height || 10)}
+                                            height={scale.heightToScreen(scale.heightToScreen(40 + 10))}
+                                            width={scale.widthToScreen(scale.widthToScreen(2 * (nodeStyle.data.width|| 10)))}
                                             fontWeight={nodeStyle.data.group ? 800 : 400}
                                             text={`${nodeStyle.data.label}`}
-                                            lineHeight={scale.heightToScreen(14)}
-                                            fontWidth={scale.sizeToScreen(6)}
-                                            textColor={nodeStyle.data.labelColor || "#fff8f8"} />),
+                                            top
+                                            center
+                                            glow={selectedNodeId === nodeStyle.key}
+                                            lineHeight={scale.avgSizeToScreen(6)}
+                                            fontWidth={scale.avgSizeToScreen(6)}
+                                            textColor={nodeStyle.data.labelColor || "#f0f0f0"} />),
                                 ...isNodeStyles(styles)
                                     .filter(style => !style.data.group && !style.data.annotation)
                                     .map(nodeStyle =>
                                         nodeStyle.data.symbol
                                             ? <text key={"SYM-" + nodeStyle.key}
-                                                x={nodeStyle.style.x} y={nodeStyle.style.y}
-                                                height={scale.heightToScreen(24)} 
+                                                x={nodeStyle.style.x}
+                                                y={nodeStyle.style.y}
+                                                height={scale.heightToScreen(24)}
                                                 width={scale.widthToScreen(80)}
                                                 onClick={(c) => {
-                                                    onClickNode({ nodeId: nodeStyle.key, graph: { x: nodeStyle.style.x, y: nodeStyle.style.y }, screen: null });
+                                                    console.log("Click")
+                                                    onClickNode && onClickNode({ nodeId: nodeStyle.key, graph: { x: nodeStyle.style.x, y: nodeStyle.style.y }, screen: null });
                                                     c.stopPropagation();
                                                 }}
+                                                filter={selectedNodeId === nodeStyle.key ? "url(#glow)" : undefined}
                                                 style={{
+                                                    userSelect: "none",
+                                                    cursor: "default",
                                                     fontFamily: nodeStyle.data.symbolFont || "FontAwesome",
-                                                    fontSize: scale.sizeToScreen(nodeStyle.data.symbolSize || 20),
+                                                    fontSize: scale.avgSizeToScreen(nodeStyle.data.symbolSize || 20),
                                                     textAnchor: "middle",
                                                     alignmentBaseline: "central",
                                                     dominantBaseline: "central",
-                                                    fill: nodeStyle.data.symbolColor || "#fff8f8",
-                                                    strokeWidth: 1,
-                                                    stroke: "#303050",
+                                                    fill: nodeStyle.data.symbolColor || "#f0f0f0",
+                                                    strokeWidth: selectedNodeId === nodeStyle.key ? 0 : 1,
+                                                    stroke: selectedNodeId === nodeStyle.key ? "white" : "#303050",
                                                 }}>{nodeStyle.data.symbol}</text>
                                             : <circle key={"SYM-" + nodeStyle.key}
                                                 cx={nodeStyle.style.x} cy={nodeStyle.style.y}
@@ -182,7 +202,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                                     onClickNode({ nodeId: nodeStyle.key, graph: { x: nodeStyle.style.x, y: nodeStyle.style.y }, screen: null });
                                                     c.stopPropagation();
                                                 }}
-                                                r={scale.sizeToScreen(((selectedNodeId === nodeStyle.key) ? 9 : 5))}
+                                                r={scale.smallestSizeToScreen(((selectedNodeId === nodeStyle.key) ? 9 : 5))}
                                                 fill={nodeStyle.data.symbolColor || "#80ff80"}
                                                 strokeWidth={(selectedNodeId === nodeStyle.key) ? 3 : 0}
                                                 stroke={(selectedNodeId === nodeStyle.key) ? "white" : "transparent"}
@@ -204,7 +224,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                         .map(edgeStyle =>
                                             <ParticleEdge key={edgeStyle.data.from.id + "-" + edgeStyle.data.linkTo}
                                                 {...edgeStyle.data}
-                                                size={scale.sizeToScreen(edgeStyle.data.size || 10)}
+                                                size={scale.avgSizeToScreen(edgeStyle.data.size || 10)}
                                                 p0={{
                                                     x: edgeStyle.style.p0x / diagramWidth,
                                                     y: 1 - edgeStyle.style.p0y / diagramHeight

@@ -40,11 +40,13 @@ export const WrappedSvgText = (props: {
     fontFamily?: string;
     fontWeight?: number;
     textColor?: string;
+    glow?: boolean;
+    top?: boolean;
 }) => {
-    const {text, height, width, center, x, y, lineHeight, fontWidth} = props;
+    const { glow, top, text, height, width, center, x, y, lineHeight, fontWidth } = props;
     const texts = wrapText(text, Math.round(width / fontWidth * 1.7));
     const adjustedLineHeight = Math.min(lineHeight, height / texts.length);
-    const yLine1 = height / 2 - (texts.length / 2 * adjustedLineHeight);
+    const yLine1 = top ? 0 : height / 2 - (texts.length / 2 * adjustedLineHeight);
     const textColor = props.textColor || "black";
     return (
         <g>
@@ -52,17 +54,27 @@ export const WrappedSvgText = (props: {
                 <clipPath key={"rect"} id={"clip" + text}>
                     <rect
                         y={y}
-                        x={x}
+                        x={x - (center ? (width / 2) : 0)}
                         width={width}
                         height={height} />
                 </clipPath>
+                <filter id="glow">
+                    <feFlood result="flood" floodColor="#ffffff" floodOpacity="1"></feFlood>
+                    <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
+                    <feMorphology in="mask" result="dilated" operator="dilate" radius="1.3"></feMorphology>
+                    <feGaussianBlur in="dilated" result="blurred" stdDeviation="2"></feGaussianBlur>
+                    <feMerge>
+                        <feMergeNode in="blurred"></feMergeNode>
+                        <feMergeNode in="SourceGraphic"></feMergeNode>
+                    </feMerge>
+                </filter>
             </defs>
             {
                 texts.map((str, i) => React.createElement("text", {
                     key: "text" + i,
                     y: y + yLine1 + adjustedLineHeight * i,
-                    x: x + (center ? (width / 2) : 4),
-                    textAnchor: center ? "center" : "start",
+                    x: x + 0,//(center ? (width / 2) : 4),
+                    textAnchor: center ? "middle" : "start",
                     alignmentBaseline: "hanging",
                     width: width - 8,
                     height: adjustedLineHeight,
@@ -70,8 +82,13 @@ export const WrappedSvgText = (props: {
                     fontFamily: props.fontFamily || "Arial",
                     fontSize: fontWidth,
                     fill: textColor,
-                    strokeWidth: 0.5,
-                    stroke: "black",
+                    style: {
+                        userSelect: "none",
+                        cursor: "default",
+                    },
+                    strokeWidth: glow ? 0 : 0.5,
+                    stroke: glow ? "white" : "black",
+                    filter: glow ? "url(#glow)" : undefined,
                     clipPath: "url(#clip" + text + ")",
                 }, str))
             }

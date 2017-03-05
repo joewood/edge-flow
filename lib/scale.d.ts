@@ -16,5 +16,6 @@ export declare class Scale {
     scaleYToScreen(y: number): number;
     heightToScreen(height: number): number;
     widthToScreen(width: number): number;
-    sizeToScreen(size: number): number;
+    avgSizeToScreen(size: number): number;
+    smallestSizeToScreen(size: number): number;
 }
