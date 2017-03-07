@@ -62,7 +62,7 @@ export const WrappedSvgText = (props: {
                     <feFlood result="flood" floodColor="#ffffff" floodOpacity="1"></feFlood>
                     <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
                     <feMorphology in="mask" result="dilated" operator="dilate" radius="1.3"></feMorphology>
-                    <feGaussianBlur in="dilated" result="blurred" stdDeviation="2"></feGaussianBlur>
+                    <feGaussianBlur in="dilated" result="blurred" stdDeviation={height/10}></feGaussianBlur>
                     <feMerge>
                         <feMergeNode in="blurred"></feMergeNode>
                         <feMergeNode in="SourceGraphic"></feMergeNode>
@@ -86,7 +86,7 @@ export const WrappedSvgText = (props: {
                         userSelect: "none",
                         cursor: "default",
                     },
-                    strokeWidth: glow ? 0 : 0.5,
+                    strokeWidth: 0,
                     stroke: glow ? "white" : "black",
                     filter: glow ? "url(#glow)" : undefined,
                     clipPath: "url(#clip" + text + ")",

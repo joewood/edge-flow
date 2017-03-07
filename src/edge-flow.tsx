@@ -165,7 +165,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                         <WrappedSvgText key={"TEXT-" + nodeStyle.key}
                                             x={nodeStyle.style.x}
                                             y={nodeStyle.style.y + scale.avgSizeToScreen(10)}
-                                            height={scale.avgSizeToScreen(30)}
+                                            height={scale.heightToScreen(40)}
                                             width={scale.widthToScreen(40)}
                                             fontWeight={nodeStyle.data.group ? 800 : 400}
                                             text={`${nodeStyle.data.label}`}
@@ -182,8 +182,8 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                             ? <text key={"SYM-" + nodeStyle.key}
                                                 x={nodeStyle.style.x}
                                                 y={nodeStyle.style.y}
-                                                height={scale.heightToScreen(40)}
-                                                width={scale.widthToScreen(40)}
+                                                height={scale.avgSizeToScreen(20)}
+                                                width={scale.avgSizeToScreen(20)}
                                                 onClick={(c) => {
                                                     console.log("Click")
                                                     onClickNode && onClickNode({ nodeId: nodeStyle.key, graph: { x: nodeStyle.style.x, y: nodeStyle.style.y }, screen: null });
@@ -211,7 +211,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                                 }}
                                                 r={scale.avgSizeToScreen(((selectedNodeId === nodeStyle.key) ? 9 : 5))}
                                                 fill={nodeStyle.data.symbolColor || "#80ff80"}
-                                                strokeWidth={(selectedNodeId === nodeStyle.key) ? 3 : 0}
+                                                strokeWidth={(selectedNodeId === nodeStyle.key) ? 0 : 1}
                                                 stroke={(selectedNodeId === nodeStyle.key) ? "white" : "transparent"}
                                             />)
                             ]}</g>}

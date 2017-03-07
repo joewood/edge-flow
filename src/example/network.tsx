@@ -52,8 +52,8 @@ export default class Partition extends React.PureComponent<IProps, IState> {
         console.log("Rendering network")
         const { animate, width, height } = this.props;
         // const inc = 1, x = 10, y = 10;
-        const nodeStyle = { symbol: "\uf109", symbolColor: "#efefef", labelColor:"#d0d0c0", symbolSize: 18, width: 10, height: 10, };
-        const topicNode = { symbol: "\u2225", symbolColor: "#d8d8d8", labelColor:"#d0d0c0", symbolSize: 14, width: 6, height: 10 };
+        const nodeStyle = { symbol: "\uf109", symbolColor: "#efefef", labelColor:"#d0d0c0", symbolSize: 18, width: 20, height: 20, };
+        const topicNode = { symbol: "\u2225", symbolColor: "#d8d8d8", labelColor:"#d0d0c0", symbolSize: 14, width: 10, height: 20 };
         const edgeStyle = { nonrandom: true, ratePerSecond: (this.state.flow), variationMax: 0.05, variationMin: -0.05, size: 3, shape: 0.65, color: "#ffff90", pathWidth: 4, pathOpacity: 0.1, endingColor: "rgb(128,128,255)" };
         return <div key="root"
             style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black", height: height || 200, width: width || 200, overflow: "hidden" }}>

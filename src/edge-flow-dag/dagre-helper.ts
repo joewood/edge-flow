@@ -7,6 +7,7 @@ import { IEdgeDagProps } from "./dag-edge";
 import { INodeDagProps } from "./dag-node";
 import { mapChild } from "../common"
 
+
 export interface IPosEdge {
     linkTo: string;
     p0: IPoint;
@@ -29,13 +30,14 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeDagProp
     let g = new Graph()
         .setGraph({ rankdir: "LR" })
         .setDefaultEdgeLabel(function () { return {} })
-
     // Default to assigning a new object as a label for each new edge.
     g.setDefaultEdgeLabel(function () { return {}; });
     const nodes: NodeProps[] = mapChild<INodeDagProps, any>(childrenNodes,
         props => ({
-            ...props,
-            label: props.label,
+            id:props.id,
+            width:props.width,
+            height:props.height,
+            // label: props.label,
             links: mapChild<IEdgeDagProps, IEdgeDagProps>(props.children, cc => cc)
         }) as NodeProps);
     const nodeDict = keyBy(nodes, n => n.id);
