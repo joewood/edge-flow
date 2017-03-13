@@ -2,26 +2,20 @@
 import * as React from "react";
 import { Edge, IEdgeProps } from "./edge-flow-edge";
 import { Node, INodeProps } from "./edge-flow-node";
+import { NodeClickEventArgs, IPathStyle, IParticleStyle, IStyle } from "./model";
 export { Edge, IEdgeProps, Node, INodeProps };
-export interface NodeClickEventArgs {
-    nodeId: string;
-    graph: {
-        x: number;
-        y: number;
-    };
-    screen: {
-        x: number;
-        y: number;
-    };
-}
 export interface IBaseProps {
-    run?: boolean;
+    animate?: boolean;
     style: {
         width: number;
         height: number;
         backgroundColor?: string;
     };
-    nodeSize?: {
+    iconStyle?: IStyle;
+    labelStyle?: IStyle;
+    pathStyle?: IPathStyle;
+    particleStyle?: IParticleStyle;
+    nodeStyle?: {
         width: number;
         height: number;
     };

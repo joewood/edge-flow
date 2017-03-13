@@ -35,17 +35,37 @@ export default class Partition extends React.Component<IProps, IState> {
         const sourceInc = Math.floor(inc / 2);
         return [
             (!(inc % 2)) && <Node key={"source" + sourceInc} id={"source" + sourceInc} label="source" center={{ x: x, y: y }}  >
-                <Edge linkTo={"head" + inc} color="red" shape={1.0} size={12} ratePerSecond={20} pathColor="black" />
-                <Edge linkTo={"head" + (inc + 1)} color="red" shape={1.0} size={12} ratePerSecond={20} pathColor="black" />
+                <Edge linkTo={"head" + inc} particleStyle={{ color: "red", roundness: 1.0, size: 12 }} ratePerSecond={20} pathStyle={{ color: "black" }} />
+                <Edge linkTo={"head" + (inc + 1)} particleStyle={{ color: "red", roundness: 1.0, size: 12 }} ratePerSecond={20} pathStyle={{ color: "black" }} />
             </Node>,
             <Node key={"head" + inc} id={"head" + inc} center={{ x: x + 5 + inc, y: y + 10 }} group >
-                <Edge linkTo={"tail" + inc} color="rgb(255,224,224)" shape={0.01} size={6} nonrandom pathOpacity={1}
-                    variationMax={0} variationMin={0}
-                    endingColor="rgba(55,55,55,0.0)" pathColor="#101010" pathWidth={20} ratePerSecond={12} />
+                <Edge linkTo={"tail" + inc}
+                    particleStyle={{
+                        color: "rgb(255,224,224)",
+                        roundness: 0.01,
+                        size: 6,
+                        variationMax: 0,
+                        variationMin: 0,
+                        endingColor: "rgba(55,55,55,0.0)"
+                    }}
+                    pathStyle={{
+                        opacity: 1,
+                        color: "#101010",
+                        width: 20
+                    }}
+                    nonrandom
+                    ratePerSecond={12} />
             </Node >,
             <Node key={"tail" + inc} id={"tail" + inc} center={{ x: x + 5 + inc, y: y + 55 }} group />,
             <Node key={"deq" + inc} id={"deq" + inc} center={{ x: x + 5.1 + inc, y: y + 15 }} group>
-                <Edge linkTo={"sink" + inc} ratePerSecond={20} shape={1} size={12} color="#a0a0a0" pathColor="black" />
+                <Edge linkTo={"sink" + inc}
+                    ratePerSecond={20}
+                    particleStyle={{
+                        roundness: 1,
+                        size: 12,
+                        color: "#a0a0a0"
+                    }}
+                    pathStyle={{ color: "black" }} />
             </Node>,
             <Node key={"sink" + inc} id={"sink" + inc} center={{ x: x + 20, y: y }} label="sink" />
         ].filter(f => !!f);
@@ -53,12 +73,12 @@ export default class Partition extends React.Component<IProps, IState> {
 
 
     render() {
-        const { animate,  width, height} = this.props;
+        const { animate, width, height } = this.props;
         // const inc = 1, x = 10, y = 10;
         this.inc = 0;
         return <div key="root"
             style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black", height: height || 200, width: width || 200, overflow: "hidden" }}>
-            <EdgeFlow style={{ height: (height || 200) * 0.9, width: (width || 200) * 0.9, backgroundColor: "black" }} run={animate} >
+            <EdgeFlow style={{ height: (height || 200) * 0.9, width: (width || 200) * 0.9, backgroundColor: "black" }} animate={animate} >
                 {
                     [...this.getPartition(10, 10),
                     ...this.getPartition(10, 30),

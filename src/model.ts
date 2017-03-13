@@ -1,15 +1,30 @@
+
+
+export interface IStyle {
+    color?: string;
+    fontSize?: number;
+    fontFamily?: string;
+}
+
+export interface IPathStyle {
+    color?: string;
+    width?: number;
+    opacity?: number;
+}
+
 export interface IPositionlessNode {
-    symbol?: string;
-    symbolColor?: string;
-    symbolSize?: number;
-    symbolFont?: string;
-    label?: string;
-    labelColor?: string;
     id: string;
+    icon?: string;
+    /** Style to apply to the Icon */
+    iconStyle?: IStyle;
+    label?: string;
+    labelStyle?: IStyle;
     annotation?: boolean;
     group?: boolean;
-    width?:number;
-    height?:number;
+    style?: {
+        width?: number;
+        height?: number;
+    }
 }
 
 export interface INode extends IPositionlessNode {
@@ -22,24 +37,26 @@ export interface IPoint {
 }
 
 export interface ISize {
-    width:number;
-    height:number;
+    width: number;
+    height: number;
+}
+
+export interface IParticleStyle {
+    color?: string;
+    roundness?: number;
+    size?: number;
+    variationMin?: number;
+    variationMax?: number;
+    endingColor?: string;
 }
 
 export interface IPositionlessEdge {
     linkTo: string;
     ratePerSecond?: number;
-    name?: string;
-    color?: string;
-    shape?: number;
-    size?: number;
-    pathColor?: string;
-    pathWidth?: number;
-    pathOpacity?: number;
+    pathStyle?: IPathStyle;
+    particleStyle?: IParticleStyle;
     nonrandom?: boolean;
-    variationMin?: number;
-    variationMax?: number;
-    endingColor?: string;
+    name?: string;
 }
 
 export interface IEdge extends IPositionlessEdge {
@@ -53,3 +70,9 @@ export interface IEdge extends IPositionlessEdge {
     p3?: IPoint;
 }
 
+
+export interface NodeClickEventArgs {
+    nodeId: string;
+    graph: { x: number, y: number };
+    screen: { x: number, y: number };
+}

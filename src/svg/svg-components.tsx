@@ -40,10 +40,10 @@ export const WrappedSvgText = (props: {
     fontFamily?: string;
     fontWeight?: number;
     textColor?: string;
-    glow?: boolean;
+    filter?: string;
     top?: boolean;
 }) => {
-    const { glow, top, text, height, width, center, x, y, lineHeight, fontWidth } = props;
+    const { filter, top, text, height, width, center, x, y, lineHeight, fontWidth } = props;
     const texts = wrapText(text, Math.round(width / fontWidth * 1.7));
     const adjustedLineHeight = Math.min(lineHeight, height / texts.length);
     const yLine1 = top ? 0 : height / 2 - (texts.length / 2 * adjustedLineHeight);
@@ -58,16 +58,6 @@ export const WrappedSvgText = (props: {
                         width={width}
                         height={height} />
                 </clipPath>
-                <filter id="glow">
-                    <feFlood result="flood" floodColor="#ffffff" floodOpacity="1"></feFlood>
-                    <feComposite in="flood" result="mask" in2="SourceGraphic" operator="in"></feComposite>
-                    <feMorphology in="mask" result="dilated" operator="dilate" radius="1.3"></feMorphology>
-                    <feGaussianBlur in="dilated" result="blurred" stdDeviation={height/10}></feGaussianBlur>
-                    <feMerge>
-                        <feMergeNode in="blurred"></feMergeNode>
-                        <feMergeNode in="SourceGraphic"></feMergeNode>
-                    </feMerge>
-                </filter>
             </defs>
             {
                 texts.map((str, i) => React.createElement("text", {
@@ -86,9 +76,7 @@ export const WrappedSvgText = (props: {
                         userSelect: "none",
                         cursor: "default",
                     },
-                    strokeWidth: 0,
-                    stroke: glow ? "white" : "black",
-                    filter: glow ? "url(#glow)" : undefined,
+                    filter: filter,
                     clipPath: "url(#clip" + text + ")",
                 }, str))
             }

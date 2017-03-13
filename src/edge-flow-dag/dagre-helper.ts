@@ -35,9 +35,8 @@ export function getGraphFromNodes(childrenNodes: React.ReactElement<INodeDagProp
     const nodes: NodeProps[] = mapChild<INodeDagProps, any>(childrenNodes,
         props => ({
             id:props.id,
-            width:props.width,
-            height:props.height,
-            // label: props.label,
+            width:props.style && props.style.width || 15,
+            height:props.style && props.style.height || 15,
             links: mapChild<IEdgeDagProps, IEdgeDagProps>(props.children, cc => cc)
         }) as NodeProps);
     const nodeDict = keyBy(nodes, n => n.id);

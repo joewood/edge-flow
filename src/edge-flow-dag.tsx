@@ -24,16 +24,6 @@ export interface IState {
     nodes?: IPosNode[];
 }
 
-// const styles = {
-//     container: {
-//         position: "relative",
-//         display: "inline-block",
-//         verticalAlign: "top",
-//         padding: 0,
-//         margin: 0
-//     } as React.CSSProperties
-// }
-
 
 export class EdgeFlowDag extends React.PureComponent<IProps, IState> {
 
@@ -47,14 +37,14 @@ export class EdgeFlowDag extends React.PureComponent<IProps, IState> {
         type TrackChangesType = { width: number, height: number, links: { linkTo: string }[] };
         const newState = mapChild<INodeDagProps, TrackChangesType>(newProps.children,
             props => ({
-                width: props.width,
-                height: props.height,
+                width: props.style && props.style.width || 15,
+                height: props.style && props.style.height || 15,
                 links: mapChild<IEdgeDagProps, { linkTo: string }>(props.children, ({ linkTo }) => ({ linkTo }))
             }));
         const oldState = mapChild<INodeDagProps, TrackChangesType>(this.props.children,
             props => ({
-                width: props.width,
-                height: props.height,
+                width: props.style && props.style.width || 15,
+                height: props.style && props.style.height || 15,
                 links: mapChild<IEdgeDagProps, { linkTo: string }>(props.children, ({ linkTo }) => ({ linkTo }))
             }));
         if (force || !equals(newState, oldState)) {
@@ -90,22 +80,19 @@ export class EdgeFlowDag extends React.PureComponent<IProps, IState> {
         const groupedEdges = groupBy(allEdges, e => e.fromForceNode);
 
         return (<EdgeFlow {...props}>{
-            nodes
-                .map(node => (
-                    <Node key={node.id} center={posNodes[node.id]} {...node} >
-                        {groupedEdges[node.id] && groupedEdges[node.id]
-                            .filter(edge => nodeDict[edge.linkTo])
-                            .map(edge => {
-                                const ee = edgeDict[node.id + "-" + edge.linkTo];
-                                return <Edge key={edge.fromForceNode + "-" + edge.linkTo}
-                                    {...edge}
-                                    p0={ee.p0}
-                                    p1={ee.p1}
-                                    p2={ee.p2}
-                                    p3={ee.p3}
-                                />;
-                            })}
-                    </Node>))
+            nodes.map(node => (
+                <Node key={node.id} center={posNodes[node.id]} {...node} >
+                    {groupedEdges[node.id] && groupedEdges[node.id].filter(edge => nodeDict[edge.linkTo]).map(edge => {
+                        const ee = edgeDict[node.id + "-" + edge.linkTo];
+                        return <Edge key={edge.fromForceNode + "-" + edge.linkTo}
+                            {...edge}
+                            p0={ee.p0}
+                            p1={ee.p1}
+                            p2={ee.p2}
+                            p3={ee.p3}
+                        />;
+                    })}
+                </Node>))
         }</EdgeFlow>
         );
     }

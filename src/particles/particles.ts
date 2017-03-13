@@ -109,8 +109,8 @@ export default class Particles {
             let edgeIndex = 0;
             // update the texture Data, each row is a different attribute of the edge
             for (let edge of edges) {
-                const variationMin = (edge.variationMin === undefined) ? -0.01 : edge.variationMin;
-                const variationMax = (edge.variationMax === undefined) ? 0.01 : edge.variationMax;
+                const variationMin = (edge.particleStyle.variationMin === undefined) ? -0.01 : edge.particleStyle.variationMin;
+                const variationMax = (edge.particleStyle.variationMax === undefined) ? 0.01 : edge.particleStyle.variationMax;
                 // set-up vertices in edgedata
                 this.textureData.setVec2(VERTEX_ROW, edgeIndex,
                     convertBezierPoints(edge.p0, edge.p0),
@@ -118,10 +118,10 @@ export default class Particles {
                 // random variation of the particles
                 this.textureData.setValue(VARIATION_ROW, edgeIndex, variationMin, variationMax, variationMax - variationMin, Math.random());
                 // set-up color in edge Data
-                this.textureData.setColor(COLOR_ROW, edgeIndex, edge.color || this.color);
-                this.textureData.setColor(END_COLOR_ROW, edgeIndex, edge.endingColor || edge.color || this.color);
+                this.textureData.setColor(COLOR_ROW, edgeIndex, edge.particleStyle.color || this.color);
+                this.textureData.setColor(END_COLOR_ROW, edgeIndex, edge.particleStyle.endingColor || edge.particleStyle.color || this.color);
                 // set-up shape
-                this.textureData.setValue(SHAPE_ROW, edgeIndex, (edge.size || this.size || 8.0) / 256, edge.shape || 0.0, 0.0, 0.0);
+                this.textureData.setValue(SHAPE_ROW, edgeIndex, (edge.particleStyle.size || this.size || 8.0) / 256, edge.particleStyle.roundness || 0.0, 0.0, 0.0);
                 // bezier
                 this.textureData.setVec2(BEZIER_ROW, edgeIndex,
                     convertBezierPoints(edge.p1, edge.p1),

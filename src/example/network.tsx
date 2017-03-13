@@ -52,18 +52,49 @@ export default class Partition extends React.PureComponent<IProps, IState> {
         console.log("Rendering network")
         const { animate, width, height } = this.props;
         // const inc = 1, x = 10, y = 10;
-        const nodeStyle = { symbol: "\uf109", symbolColor: "#efefef", labelColor:"#d0d0c0", symbolSize: 18, width: 20, height: 20, };
-        const topicNode = { symbol: "\u2225", symbolColor: "#d8d8d8", labelColor:"#d0d0c0", symbolSize: 14, width: 10, height: 20 };
-        const edgeStyle = { nonrandom: true, ratePerSecond: (this.state.flow), variationMax: 0.05, variationMin: -0.05, size: 3, shape: 0.65, color: "#ffff90", pathWidth: 4, pathOpacity: 0.1, endingColor: "rgb(128,128,255)" };
+        const nodeStyle = {
+            icon: "\uf109",
+            iconStyle: {
+                color: "#efefef",
+                fontSize: 18
+            }, labelStyle: {
+                color: "#d0d0c0"
+            },
+            style: { width: 20, height: 10 }
+        };
+        const topicNode = {
+            icon: "\u2225",
+            iconStyle: {
+                color: "#d8d8d8",
+                fontSize: 14
+            },
+            labelStyle: {
+                color: "#d0d0c0"
+            },
+            style: { width: 10, height: 10 }
+        };
+        const edgeStyle = {
+            nonrandom: true,
+            ratePerSecond: (this.state.flow),
+            particleStyle: {
+                variationMax: 0.05,
+                variationMin: -0.05,
+                roundness: 0.85,
+                size: 4,
+                endingColor: "rgb(128,128,255)",
+                color: "#ffff90"
+            },
+            pathStyle: { width: 8, opacity: 0.1 }
+        };
         return <div key="root"
             style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black", height: height || 200, width: width || 200, overflow: "hidden" }}>
             <div key="tool" style={{ position: "absolute", right: 5, top: 5 }}>
                 <button onClick={this.addNode}>Add Node</button>
             </div>
-            <EdgeFlowDag style={{ height: (height || 200), width: (width || 200), backgroundColor: "#080810" }} run={animate} selectedNodeId={this.state.selectedNode}
+            <EdgeFlowDag style={{ height: (height || 200), width: (width || 200), backgroundColor: "#080810" }} animate={animate} selectedNodeId={this.state.selectedNode}
                 onClickNode={this.selectNode} >
                 {[
-                    <NodeDag key="source" id="source" {...nodeStyle}  label="source events" >
+                    <NodeDag key="source" id="source" {...nodeStyle} label="source events" >
                         <EdgeDag key="11E" linkTo="connector1" {...edgeStyle} />
                         <EdgeDag key="12E" linkTo="connector2" {...edgeStyle} />
                         <EdgeDag key="13E" linkTo="connector3" {...edgeStyle} />
@@ -96,7 +127,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
                     <NodeDag key="connector23" id="connector23" {...topicNode}>
                         <EdgeDag key="21E" linkTo="target" {...edgeStyle} />
                     </NodeDag>,
-                    ...this.state.nodes.map((n, i) => <NodeDag key={n && "node" + i} id={"node" + i} {...topicNode} label={"topic "+(i+8)}>
+                    ...this.state.nodes.map((n, i) => <NodeDag key={n && "node" + i} id={"node" + i} {...topicNode} label={"topic " + (i + 8)}>
                         <EdgeDag linkTo={(i % 2) ? "target" : "connector23"} {...edgeStyle} />
                     </NodeDag>),
                     <NodeDag key="target" id="target" {...nodeStyle} label="target" />

@@ -19,6 +19,34 @@ Package comes with types built in (it's written using TypeScript).
 
 Live demo at [joewood.github.io/edge-flow](http://joewood.github.io/#edge-flow)
 
+## Simple Directed Graph Usage
+
+```jsx
+import { EdgeFlowDag, NodeDag, EdgeDag } from "edge-flow"
+
+:: ::
+
+render() {
+    return (
+        <EdgeFlowDag style={{backgroundColor:"#0f0f0f",height:600,width:600}} run={true}>
+            <NodeDag key="1" id="node-1" label="node-1' labelColor="white" >
+                <EdgeDag linkTo="node-2" ratePerSecond={30} color="blue" size={2} />
+            </NodeDag>
+            <NodeDag key="2" id="node-2" label="node-2' labelColor="white">
+                <EdgeDag linkTo="node-3" ratePerSecond={30} color="red" shape={0.2}/>
+            </NodeDag>
+            <NodeDag key="3" id="node-3" label="node-3' labelColor="white">
+                <EdgeDag linkTo="node-1" ratePerSecond={30}  color="pink" shape={0.8} size={10} />
+            </NodeDag>
+        </EdgeFlowDag>
+    );
+}
+
+```                     
+
+
+
+
 ## Usage
 
 ```jsx
@@ -26,21 +54,21 @@ import { EdgeFlow, Node, Edge } from "edge-flow"
 
 :: ::
 
-    render() {
-        return (
-            <EdgeFlow backgroundColor="#0f0f0f" height={600} width={600} run={true}>
-                <Node key="1" id="node-1" label="node-1' x={30} y={20} labelColor="white" >
-                    <Edge linkTo="node-2" ratePerSecond={30} color="blue" size={2} />
-                </Node>
-                <Node key="2" id="node-2" label="node-2' x={530} y={120} labelColor="white">
-                    <Edge linkTo="node-3" ratePerSecond={30} variationMin={-0.01} variationMax={0.05} color="red" shape={0.2}/>
-                </Node>
-                <Node key="3" id="node-3" label="node-3' x={330} y={520} labelColor="white">
-                    <Edge linkTo="node-1" ratePerSecond={30} variationMin={-0.06} variationMax={0.06} color="pink" shape={0.8} size={10} />
-                </Node>
-            </EdgeFlow>
-        );
-    }
+render() {
+    return (
+        <EdgeFlow style={{backgroundColor:"#0f0f0f",height:600,width:600}} run={true}>
+            <Node key="1" id="node-1" label="node-1' center={{x:30,y:20}} labelColor="white" >
+                <Edge linkTo="node-2" ratePerSecond={30} color="blue" size={2} />
+            </Node>
+            <Node key="2" id="node-2" label="node-2' center={{x:530,y:120}} labelColor="white">
+                <Edge linkTo="node-3" ratePerSecond={30} variationMin={-0.01} variationMax={0.05} color="red" shape={0.2}/>
+            </Node>
+            <Node key="3" id="node-3" label="node-3' center={{x:330,y:520}} labelColor="white">
+                <Edge linkTo="node-1" ratePerSecond={30} variationMin={-0.06} variationMax={0.06} color="pink" shape={0.8} size={10} />
+            </Node>
+        </EdgeFlow>
+    );
+}
 ```                     
 
 # Components and Properties
@@ -90,11 +118,13 @@ nonrandom       | boolean  | Disable random distribution of particles (evenly sp
 
 Main underlying component providing absolute positioning
 
-Prop            | Datatype | Description
-----------------|----------|------------
-backgroundColor | string   | Background Color of the canvas
-height, width   | number   | Size of the Graph
-run             | boolean  | Animate Graph 
+Prop                  | Datatype | Description
+----------------------|----------|------------
+style:                | Style... |
+style.backgroundColor | string   | Background Color of the canvas
+style.height          | number   | Size of the Graph, pixels
+style.width           | number   | Size of the Graph
+run                   | boolean  | Animate Graph 
 
 ### Node
 
@@ -103,7 +133,7 @@ Represents a node on the Graph
 Prop            | Datatype | Description
 ----------------|----------|------------
 id              | string   | Used to identify the node (for edges)
-x,y             | number   | Location of Node (auto-scales)
+center          | {x,y}    | Location of Node (auto-scales)
 label?          | string   | Label attached to the Node
 labelColor?     | string   | Color of the label text
 symbol?         | string   | String used for a font-icon (e.g. FontAwesome)
