@@ -4,10 +4,10 @@
 
 import * as React from "react";
 import { maxBy, minBy, keyBy } from "lodash";
-import { TransitionMotion } from "react-motion";
+import { TransitionMotion, spring } from "react-motion";
 import Color = require("color");
+import { ParticleCanvas, ParticleEdge } from "partican";
 
-import { ParticleCanvas, ParticleEdge } from "./particles/particle-canvas";
 import { Edge, IEdgeProps } from "./edge-flow-edge";
 import { Node, INodeProps } from "./edge-flow-node";
 import { NodeClickEventArgs, IPathStyle, IParticleStyle, IStyle } from "./model";
@@ -15,11 +15,9 @@ import { getChildrenProps } from "./common"
 import { EdgeAndNodeType, MotionStyle, createDefaultEdgeStyle, createDefaultNodeStyle, createEdgeStyle, createNodeStyle, isNodeStyles, isEdgeStyles } from "./animation-style"
 import { Scale } from "./scale"
 import SvgGraph from "./svg/svg-graph"
-import { spring } from "react-motion";
 
 
 export { Edge, IEdgeProps, Node, INodeProps, };
-
 
 const defaults = {
     iconStyle: {
@@ -167,7 +165,10 @@ export class EdgeFlow extends React.Component<IProps, IState> {
         ];
         return (
             <div key="root" style={composedStyle} >
-                <svg key="svg" width={width} height={height} style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
+                <svg key="svg"
+                    width={width}
+                    height={height}
+                    style={{ left: 0, top: 0, backgroundColor: backgroundColor, position: "absolute" }}
                     onClick={() => onClickNode && onClickNode({ nodeId: null, graph: null, screen: null })}>
                     <defs>
                         <filter id="symglow">
@@ -210,53 +211,44 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                             ]}</g>}
                     </TransitionMotion>)
                 </svg>
-                <div key="particleContainer"
-                    style={{ pointerEvents: "none", position: "absolute", left: 0, top: 0 }}>
-                    <TransitionMotion key="motion-anim"
-                        defaultStyles={defaultStyles}
-                        styles={springStyles}>{
-                            (styles: MotionStyle[]) =>
-                                <ParticleCanvas key="particles"
-                                    width={diagramWidth}
-                                    height={diagramHeight}
-                                    run={animate}
-                                    backgroundColor={backgroundColor}>
-                                    {
-                                        isEdgeStyles(styles).map(edgeStyle =>
-                                            <ParticleEdge key={edgeStyle.data.from.id + "-" + edgeStyle.data.linkTo}
-                                                {...edgeStyle.data}
-                                                particleStyle={{
-                                                    ...defaults.particleStyle,
-                                                    ...particleStyle,
-                                                    ...edgeStyle.data.particleStyle,
-                                                    size: scale.avgSizeToScreen(edgeStyle.data.particleStyle && edgeStyle.data.particleStyle.size || 10)
-                                                }}
-                                                pathStyle={{
-                                                    ...defaults.pathStyle,
-                                                    ...pathStyle,
-                                                    ...edgeStyle.data.pathStyle,
-                                                }}
-                                                p0={{
-                                                    x: edgeStyle.style.p0x / diagramWidth,
-                                                    y: 1 - edgeStyle.style.p0y / diagramHeight
-                                                }}
-                                                p1={{
-                                                    x: edgeStyle.style.p1x / diagramWidth,
-                                                    y: 1 - edgeStyle.style.p1y / diagramHeight
-                                                }}
-                                                p2={{
-                                                    x: edgeStyle.style.p2x / diagramWidth,
-                                                    y: 1 - edgeStyle.style.p2y / diagramHeight
-                                                }}
-                                                p3={{
-                                                    x: edgeStyle.style.p3x / diagramWidth,
-                                                    y: 1 - edgeStyle.style.p3y / diagramHeight
-                                                }}
-                                            />)
-                                    }
-                                </ParticleCanvas>}
-                    </TransitionMotion>
-                </div>
+                <TransitionMotion key="motion-anim"
+                    defaultStyles={defaultStyles}
+                    styles={springStyles}>{
+                        (styles: MotionStyle[]) =>
+                            <ParticleCanvas key="particles"
+                                style={{ width: diagramWidth, height: diagramHeight, backgroundColor: backgroundColor }}
+                                defaultParticleStyle={particleStyle}
+                                run={animate}>{
+                                    isEdgeStyles(styles).map(edgeStyle =>
+                                        <ParticleEdge key={edgeStyle.data.from.id + "-" + edgeStyle.data.linkTo}
+
+                                            {...edgeStyle.data}
+
+                                            particleStyle={{
+                                                ...defaults.particleStyle,
+                                                ...particleStyle,
+                                                ...edgeStyle.data.particleStyle,
+                                                size: scale.avgSizeToScreen(edgeStyle.data.particleStyle && edgeStyle.data.particleStyle.size || 10)
+                                            }}
+                                            p0={{
+                                                x: edgeStyle.style.p0x / diagramWidth,
+                                                y: 1 - edgeStyle.style.p0y / diagramHeight
+                                            }}
+                                            p1={{
+                                                x: edgeStyle.style.p1x / diagramWidth,
+                                                y: 1 - edgeStyle.style.p1y / diagramHeight
+                                            }}
+                                            p2={{
+                                                x: edgeStyle.style.p2x / diagramWidth,
+                                                y: 1 - edgeStyle.style.p2y / diagramHeight
+                                            }}
+                                            p3={{
+                                                x: edgeStyle.style.p3x / diagramWidth,
+                                                y: 1 - edgeStyle.style.p3y / diagramHeight
+                                            }}
+                                        />)
+                                }</ParticleCanvas>}
+                </TransitionMotion>
             </div >
         );
     }

@@ -82,16 +82,18 @@ export class EdgeFlowDag extends React.PureComponent<IProps, IState> {
         return (<EdgeFlow {...props}>{
             nodes.map(node => (
                 <Node key={node.id} center={posNodes[node.id]} {...node} >
-                    {groupedEdges[node.id] && groupedEdges[node.id].filter(edge => nodeDict[edge.linkTo]).map(edge => {
-                        const ee = edgeDict[node.id + "-" + edge.linkTo];
-                        return <Edge key={edge.fromForceNode + "-" + edge.linkTo}
-                            {...edge}
-                            p0={ee.p0}
-                            p1={ee.p1}
-                            p2={ee.p2}
-                            p3={ee.p3}
-                        />;
-                    })}
+                    {groupedEdges[node.id] && groupedEdges[node.id]
+                        .filter(edge => nodeDict[edge.linkTo])
+                        .map(edge => {
+                            const ee = edgeDict[node.id + "-" + edge.linkTo];
+                            return <Edge key={edge.fromForceNode + "-" + edge.linkTo}
+                                {...edge}
+                                p0={ee.p0}
+                                p1={ee.p1}
+                                p2={ee.p2}
+                                p3={ee.p3}
+                            />;
+                        })}
                 </Node>))
         }</EdgeFlow>
         );

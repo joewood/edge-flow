@@ -45,7 +45,9 @@ export default class Swirl extends React.Component<IProps, IState> {
         const numPoints = points.length;
         return <div key="root"
             style={{ display: "flex", flexDirection: "column", alignItems: "stretch", backgroundColor: "black", height: height, width: width, overflow: "hidden" }}>
-            <EdgeFlow style={{ height: height * 0.8 - 20, width: width * 0.8, backgroundColor: "#0f0f0f" }} animate={animate} >
+            <EdgeFlow key="edgeflow" style={{ height: height * 0.8 - 20, width: width * 0.8, backgroundColor: "#0f0f0f" }} 
+            
+            animate={animate} >
                 {
                     [...points.map((p, i) =>
                         <Node key={"node" + i} id={"node" + i} label={i.toString()} center={{ x: p.x, y: p.y }}
@@ -57,8 +59,8 @@ export default class Swirl extends React.Component<IProps, IState> {
                                 particleStyle={{
                                     variationMin: -0.1,
                                     variationMax: 0.1,
-                                    size: 5.0,
-                                    roundness: 0.0,
+                                    size: 8.0,
+                                    roundness: 0.6,
                                     color: `rgb(${Math.round(255 - i / points.length * 200)},200,${Math.round(i / points.length * 200 + 50)})`
                                 }}
                                 pathStyle={{
@@ -78,7 +80,7 @@ export default class Swirl extends React.Component<IProps, IState> {
                                 particleStyle={{
                                     color: "#e0ffe0",
                                     size: 8,
-                                    roundness: 1.0,
+                                    roundness: 0.6,
                                     endingColor: "rgba(192,255,192,0.0)"
                                 }}
                                 pathStyle={{

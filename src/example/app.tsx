@@ -65,8 +65,6 @@ class App extends React.Component<any, IState> {
                     onClick={() => this.setState({ animate: !this.state.animate })}>Pause</button>
                 <button key="swirl" style={buttonStyle}
                     onClick={() => this.setState({ screen: Screen.SWIRL })}>Swirl</button>
-                <button key="partition" style={buttonStyle}
-                    onClick={() => this.setState({ screen: Screen.PARTITION })}>Partition</button>
                 <button key="network" style={buttonStyle}
                     onClick={() => this.setState({ screen: Screen.NETWORK })}>Network</button>
             </div>

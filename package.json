@@ -54,11 +54,14 @@
   },
   "dependencies": {
     "ciena-dagre": "^1.0.1",
+    "ciena-graphlib": "^1.0.0",
     "color": "^1.0.3",
     "equals": "^1.0.5",
     "font-awesome": "^4.7.0",
     "igloo-ts": "^1.0.0",
     "lodash": "^4.17.4",
+    "ngraph.forcelayout": "^0.1.2",
+    "ngraph.graph": "0.0.12",
     "partican": "^0.1.0",
     "react-motion": "^0.4.7"
   }
