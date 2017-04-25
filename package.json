@@ -62,7 +62,7 @@
     "lodash": "^4.17.4",
     "ngraph.forcelayout": "^0.1.2",
     "ngraph.graph": "0.0.12",
-    "partican": "^0.1.0",
+    "partican": "^0.1.2",
     "react-motion": "^0.4.7"
   }
 }
