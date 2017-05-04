@@ -219,10 +219,11 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                 style={{ width: diagramWidth, height: diagramHeight, backgroundColor: backgroundColor }}
                                 defaultParticleStyle={particleStyle}
                                 run={animate}>{
-                                    isEdgeStyles(styles).map(edgeStyle =>
-                                        <ParticleEdge key={edgeStyle.data.from.id + "-" + edgeStyle.data.linkTo}
+                                    isEdgeStyles(styles).map(edgeStyle => {
+                                        const { linkTo, pathStyle,name,from,isNode,isEdge,...edgeDat } = edgeStyle.data;
+                                        return <ParticleEdge key={edgeStyle.data.from.id + "-" + edgeStyle.data.linkTo}
 
-                                            {...edgeStyle.data}
+                                            {...edgeDat}
 
                                             particleStyle={{
                                                 ...defaults.particleStyle,
@@ -246,7 +247,8 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                                 x: edgeStyle.style.p3x / diagramWidth,
                                                 y: 1 - edgeStyle.style.p3y / diagramHeight
                                             }}
-                                        />)
+                                        />;
+                                    })
                                 }</ParticleCanvas>}
                 </TransitionMotion>
             </div >

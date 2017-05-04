@@ -86,8 +86,9 @@ export class EdgeFlowDag extends React.PureComponent<IProps, IState> {
                         .filter(edge => nodeDict[edge.linkTo])
                         .map(edge => {
                             const ee = edgeDict[node.id + "-" + edge.linkTo];
+                            const { fromForceNode,...propse } = edge;
                             return <Edge key={edge.fromForceNode + "-" + edge.linkTo}
-                                {...edge}
+                                {...propse}
                                 p0={ee.p0}
                                 p1={ee.p1}
                                 p2={ee.p2}
