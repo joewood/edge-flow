@@ -56,7 +56,6 @@ export class EdgeFlowDag extends React.PureComponent<IProps, IState> {
     }
 
     public componentWillReceiveProps(newProps: IProps) {
-        console.log("new Props");
         if (newProps.children !== this.props.children) {
             this.setState({ nodes: this.getStateFromProps(newProps) });
         }
@@ -67,7 +66,6 @@ export class EdgeFlowDag extends React.PureComponent<IProps, IState> {
         const posNodes = keyBy(state.nodes, n => n.id);
         const { children, ...props } = this.props;
         const nodes = getChildrenProps<INodeDagProps>(children) || [];
-        console.log("Rendering DAG " + nodes.length);
         const nodeDict = keyBy(nodes, n => n.id);
         const posEdges = flatten(state.nodes.map(n => n.edges.map(e => ({ ...e, id: n.id }))));
         const edgeDict = keyBy(posEdges, e => e.id + "-" + e.linkTo)

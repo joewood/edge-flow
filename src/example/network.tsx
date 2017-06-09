@@ -48,7 +48,6 @@ export default class Partition extends React.PureComponent<IProps, IState> {
 	};
 
 	render() {
-		console.log("Rendering network");
 		const { animate, width, height } = this.props;
 		const defaultIcon = "\uf109";
 		const topicIcon = "\u2225";
@@ -57,7 +56,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
 			icon: topicIcon,
 			iconStyle: {
 				color: "#d8d8d8",
-				fontSize: 14
+				fontSize: 20
 			}
 		};
 		const edgeStyle = {
@@ -71,7 +70,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
 					display: "flex",
 					flexDirection: "column",
 					alignItems: "stretch",
-					backgroundColor: "black",
+					backgroundColor: "blue",
 					height: height || 200,
 					width: width || 200,
 					overflow: "hidden"
@@ -82,13 +81,14 @@ export default class Partition extends React.PureComponent<IProps, IState> {
 					style={{ height: height || 200, width: width || 200, backgroundColor: "transparent" }}
 					animate={animate}
 					selectedNodeId={this.state.selectedNode}
-					pathStyle={{ width: 6, opacity: 0.1, color: "blue" }}
+					pathStyle={{ width: 3, opacity: 0.1, color: "white" }}
 					iconStyle={{
 						color: "#efefef",
-						fontSize: 18
+						fontSize: 28
 					}}
 					labelStyle={{
-						color: "#d0d0c0"
+						color: "#d0d0c0",
+						fontSize:30
 					}}
 					nodeStyle={{
 						width: 20,
@@ -97,7 +97,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
 					particleStyle={{
 						variationMax: 0.05,
 						variationMin: -0.05,
-						roundness: 0.6,
+						roundness: 0.8,
 						size: 2,
 						endingColor: "rgb(128,128,255)",
 						color: "#ffff90"

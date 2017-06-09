@@ -93,7 +93,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
 
 	public render() {
 		const nodes = getChildrenProps<INodeProps>(this.props.children) || [];
-		console.log("Rendering Edge Flow: " + nodes.length);
+		// console.log("Rendering Edge Flow: " + nodes.length);
 		const errorNodes = nodes.filter(
 			n => n.center.x === undefined || isNaN(n.center.x) || n.center.y === undefined || isNaN(n.center.y)
 		);
