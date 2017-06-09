@@ -10,7 +10,9 @@ export class Scale {
     private screenSize: ISize;
     private toScreenScale: IPoint;
 
-    constructor(private min: IPoint, private max: IPoint, private screen: ISize, private topLeftMarginVirtual: ISize, private bottomRightMarginVirtual: ISize) {
+    constructor(private min: IPoint, private max: IPoint, private screen: ISize, private topLeftMarginVirtual: ISize, private bottomRightMarginVirtual: ISize,
+        private maxScale=3
+    ) {
         this.offsetScreen = { x: 0, y: 0 };
         this.updateScale();
     }
@@ -34,7 +36,10 @@ export class Scale {
     private updateScale() {
         this.virtualSize = { width: this.max.x - this.min.x + this.bottomRightMarginVirtual.width + this.topLeftMarginVirtual.width, height: this.max.y - this.min.y + this.topLeftMarginVirtual.height + this.bottomRightMarginVirtual.height };
         this.screenSize = this.screen;
-        this.toScreenScale = { x: this.screenSize.width / this.virtualSize.width, y: this.screenSize.height / this.virtualSize.height };
+        const scaleuniform = Math.min(Math.min(this.screenSize.width / this.virtualSize.width,this.screenSize.height / this.virtualSize.height),this.maxScale);
+        this.toScreenScale = { x: scaleuniform, y: scaleuniform };
+        console.log("Scale:",scaleuniform );
+        // this.toScreenScale = { x: this.screenSize.width / this.virtualSize.width, y: this.screenSize.height / this.virtualSize.height };
         if (this.toScreenScale.x > (2 * this.toScreenScale.y)) this.toScreenScale.x = this.toScreenScale.y * 2;
         if (this.toScreenScale.y > (2 * this.toScreenScale.x)) this.toScreenScale.y = this.toScreenScale.x * 2;
     }

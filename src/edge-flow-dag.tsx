@@ -17,7 +17,7 @@ import { getGraphFromNodes, getLayout, IPosNode } from "./edge-flow-dag/dagre-he
 import { getChildrenProps, mapChild } from "./common";
 
 export interface IProps extends IBaseProps {
-    children?: NodeDag[];
+    children?: NodeDag;
 }
 
 export interface IState {

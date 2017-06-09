@@ -11,6 +11,7 @@ export interface IBaseProps {
         height: number;
         backgroundColor?: string;
     };
+    maxScale?: number;
     iconStyle?: IStyle;
     labelStyle?: IStyle;
     pathStyle?: IPathStyle;

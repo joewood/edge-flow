@@ -6,7 +6,7 @@ import { Node as NodeDag, INodeDagProps } from "./edge-flow-dag/dag-node";
 export { EdgeDag, IEdgeDagProps, NodeDag, INodeDagProps };
 import { IPosNode } from "./edge-flow-dag/dagre-helper";
 export interface IProps extends IBaseProps {
-    children?: NodeDag[];
+    children?: NodeDag;
 }
 export interface IState {
     nodes?: IPosNode[];

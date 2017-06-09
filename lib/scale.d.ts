@@ -5,11 +5,12 @@ export declare class Scale {
     private screen;
     private topLeftMarginVirtual;
     private bottomRightMarginVirtual;
+    private maxScale;
     offsetScreen: IPoint;
     private virtualSize;
     private screenSize;
     private toScreenScale;
-    constructor(min: IPoint, max: IPoint, screen: ISize, topLeftMarginVirtual: ISize, bottomRightMarginVirtual: ISize);
+    constructor(min: IPoint, max: IPoint, screen: ISize, topLeftMarginVirtual: ISize, bottomRightMarginVirtual: ISize, maxScale?: number);
     getTransform(): {
         x: number;
         y: number;
