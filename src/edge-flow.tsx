@@ -254,7 +254,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
 						<ParticleCanvas
 							key="particles"
 							style={{ width: diagramWidth, height: diagramHeight, backgroundColor: backgroundColor }}
-							defaultParticleStyle={particleStyle}
+							particleStyle={particleStyle}
 							run={animate}
 						>
 							{isEdgeStyles(styles).map(edgeStyle => {
