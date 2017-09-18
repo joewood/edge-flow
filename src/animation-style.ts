@@ -1,7 +1,6 @@
 import { Dictionary } from "lodash";
 import { IPoint } from "./model";
-import { INodeProps } from "./edge-flow-node";
-import { IEdgeProps } from "./edge-flow-edge";
+import { INodeProps, IEdgeProps } from "./edge-flow-children";
 import { OpaqueConfig, spring, TransitionStyle, TransitionPlainStyle } from "react-motion";
 import { Scale } from "./scale";
 

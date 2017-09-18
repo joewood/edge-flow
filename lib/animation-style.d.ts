@@ -1,18 +1,14 @@
 /// <reference types="lodash" />
 import { Dictionary } from "lodash";
 import { IPoint } from "./model";
-import { INodeProps } from "./edge-flow-node";
-import { IEdgeProps } from "./edge-flow-edge";
-import { OpaqueConfig } from "react-motion";
+import { INodeProps, IEdgeProps } from "./edge-flow-children";
+import { OpaqueConfig, TransitionStyle, TransitionPlainStyle } from "react-motion";
 import { Scale } from "./scale";
-export interface EdgeStyleBase {
-    key: string;
-    data: EdgeAndNodeType & {
+export interface EdgeStyleBase extends TransitionStyle {
+    data: any | EdgeAndNodeType & {
         isNode: boolean;
         isEdge: boolean;
     };
-}
-export interface EdgeStyle {
 }
 export interface EdgeStyle extends EdgeStyleBase {
     style: {
@@ -57,13 +53,8 @@ export interface EdgeDefaultStyle extends EdgeStyleBase {
     };
 }
 export interface NodeStyleBase {
-    key: string;
-    data: INodeProps & {
-        isNode: boolean;
-        isEdge: boolean;
-    };
 }
-export interface NodeStyle extends NodeStyleBase {
+export interface NodeStyle extends NodeStyleBase, TransitionPlainStyle {
     style: {
         x?: number;
         y?: number;
@@ -73,7 +64,7 @@ export interface NodeStyle extends NodeStyleBase {
         scaleY?: number;
     };
 }
-export interface NodeDefaultStyle extends NodeStyleBase {
+export interface NodeDefaultStyle extends TransitionStyle, NodeStyleBase {
     style: {
         x?: OpaqueConfig;
         y?: OpaqueConfig;

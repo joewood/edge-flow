@@ -1,7 +1,6 @@
 /// <reference types="react" />
 import * as React from "react";
-import { Edge, IEdgeProps } from "./edge-flow-edge";
-import { Node, INodeProps } from "./edge-flow-node";
+import { Edge, IEdgeProps, Node, INodeProps } from "./edge-flow-children";
 import { NodeClickEventArgs, IPathStyle, IParticleStyle, IStyle } from "./model";
 export { Edge, IEdgeProps, Node, INodeProps };
 export interface IBaseProps {
@@ -24,7 +23,7 @@ export interface IBaseProps {
     selectedNodeId?: string;
 }
 export interface IProps extends IBaseProps {
-    children?: Node[];
+    children?: any;
 }
 export interface IState {
 }

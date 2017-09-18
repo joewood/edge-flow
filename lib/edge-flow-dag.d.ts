@@ -1,12 +1,11 @@
 /// <reference types="react" />
 import * as React from "react";
 import { IBaseProps } from "./edge-flow";
-import { Edge as EdgeDag, IEdgeDagProps } from "./edge-flow-dag/dag-edge";
-import { Node as NodeDag, INodeDagProps } from "./edge-flow-dag/dag-node";
+import { EdgeDag, IEdgeDagProps, NodeDag, INodeDagProps } from "./edge-flow-dag-children";
+import { IPosNode } from "./dagre-helper";
 export { EdgeDag, IEdgeDagProps, NodeDag, INodeDagProps };
-import { IPosNode } from "./edge-flow-dag/dagre-helper";
 export interface IProps extends IBaseProps {
-    children?: NodeDag;
+    children?: any;
 }
 export interface IState {
     nodes?: IPosNode[];

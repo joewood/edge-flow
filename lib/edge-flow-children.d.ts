@@ -1,9 +1,13 @@
 /// <reference types="react" />
 import * as React from "react";
-import { INode } from "./model";
-import { Edge, IEdgeProps } from "./edge-flow-edge";
+import { INode, IEdge } from "./model";
+export interface IEdgeProps extends IEdge {
+}
+export declare class Edge extends React.Component<IEdgeProps, any> {
+    render(): JSX.Element;
+}
 export interface INodeProps extends INode {
-    children?: Edge[];
+    children?: any;
 }
 export declare class Node extends React.Component<INodeProps, any> {
     getLinks(): IEdgeProps[];

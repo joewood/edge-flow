@@ -125,14 +125,14 @@ export default class Partition extends React.PureComponent<IProps, IState> {
 					<NodeDag key="connector12" id="connector12" {...topicNode} label="topic 5">
 						<EdgeDag key="21E" linkTo="target" {...edgeStyle} />
 					</NodeDag>
-					<NodeDag key="connector13" id="connector13" {...topicNode}>
+					<NodeDag key="connector13" id="connector13" {...topicNode} label="Unknown">
 						{this.state.nodes
 							.filter((n, i) => (n && i) % 2 == 1)
 							.map((n, i) => <EdgeDag linkTo={n && "node" + i} key={"node" + i} {...edgeStyle} />)}
 						<EdgeDag key="21E" linkTo="connector23" {...edgeStyle} />
 					</NodeDag>
 
-					<NodeDag key="connector23" id="connector23" {...topicNode}>
+					<NodeDag key="connector23" id="connector23" {...topicNode} label="topic">
 						<EdgeDag key="21E" linkTo="target" {...edgeStyle} />
 					</NodeDag>
 					{this.state.nodes.map((n, i) =>

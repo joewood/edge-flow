@@ -8,8 +8,7 @@ import { TransitionMotion, spring, TransitionStyle, TransitionPlainStyle } from 
 import Color = require("color");
 import { ParticleCanvas, ParticleEdge } from "partican";
 
-import { Edge, IEdgeProps } from "./edge-flow-edge";
-import { Node, INodeProps } from "./edge-flow-node";
+import { Edge, IEdgeProps, Node, INodeProps  } from "./edge-flow-children";
 import { NodeClickEventArgs, IPathStyle, IParticleStyle, IStyle } from "./model";
 import { getChildrenProps } from "./common";
 import {
