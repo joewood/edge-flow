@@ -1,38 +1,29 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-// import { range } from "lodash";
-import Swirl from "./swirl";
-import Network from "./network";
 import "font-awesome/css/font-awesome.css";
-
-enum Screen {
-    SWIRL,
-    SIMPLE,
-    PARTITION,
-    NETWORK
-}
+import Network from "./network";
 
 interface IState {
-    screen: Screen;
     width?: number;
     height?: number;
     animate?: boolean;
-    animationIndex: number;
+    nodes?: { name: string }[];
+    selectedNode?: string;
 }
 
 class App extends React.Component<any, IState> {
     // private resizeHandler: EventListenerOrEventListenerObject;
     private div: HTMLDivElement;
-    private timer: number;
+    private nodeIndex=10;
 
     constructor(p: any) {
         super(p);
         this.state = {
-            screen: Screen.NETWORK,
+            nodes: [],
             height: 300,
             width: 300,
             animate: false,
-            animationIndex: 0
+            selectedNode: null
         };
     }
 
@@ -45,7 +36,7 @@ class App extends React.Component<any, IState> {
     };
 
     public componentDidMount() {
-        this.timer = window.setInterval(this.moveNext, 2000);
+        // this.timer = window.setInterval(this.moveNext, 2000);
         window.addEventListener("resize", this.onResize);
         this.setState({
             width: document.getElementById("root").clientWidth,
@@ -54,18 +45,26 @@ class App extends React.Component<any, IState> {
     }
 
     public componentWillUnmount() {
-        window.clearInterval(this.timer);
+        // window.clearInterval(this.timer);
         window.removeEventListener("resize", this.onResize);
     }
 
-    private moveNext = () => {
-        if (!this.state.animate) return;
-        const animationIndex = this.state.animationIndex + 1;
-        this.setState({ animationIndex: animationIndex });
+
+    private addNode = () => {
+        this.setState({ nodes: [{ name: "node" + this.nodeIndex++ }, ...this.state.nodes] });
+    };
+
+    private removeNode = () => {
+        console.log("Removing  " + this.state.selectedNode, this.state.nodes);
+        this.setState({ nodes: this.state.nodes.filter(n => n.name != this.state.selectedNode) });
+        console.log(
+            "Removing Afer " + this.state.selectedNode,
+            this.state.nodes.filter(n => n.name != this.state.selectedNode)
+        );
     };
 
     public render() {
-        const { screen, width, height, animate, animationIndex } = this.state;
+        const { width, height, animate } = this.state;
         const buttonStyle = { height: 50, width: 130, margin: 5, color: "black" };
         return (
             <div
@@ -82,18 +81,27 @@ class App extends React.Component<any, IState> {
                     >
                         Pause
                     </button>
-                    <button key="swirl" style={buttonStyle} onClick={() => this.setState({ screen: Screen.SWIRL })}>
-                        Swirl
+                    <button key="Add" style={buttonStyle} onClick={this.addNode}>
+                        Add
                     </button>
-                    <button key="network" style={buttonStyle} onClick={() => this.setState({ screen: Screen.NETWORK })}>
-                        Network
+                    <button key="Remove" style={buttonStyle} onClick={this.removeNode}>
+                        Remove {this.state.selectedNode}
+                    </button>
+                    <button key="Reset" style={buttonStyle} onClick={() => this.setState({ nodes: [] })}>
+                        Reset
                     </button>
                 </div>
-                {screen == Screen.SWIRL ? (
-                    <Swirl animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
-                ) : (
-                    <Network animate={animate} height={height - 60} width={width} />
-                )}
+                <Network
+                    animate={animate}
+                    height={height - 60}
+                    width={width}
+                    nodes={this.state.nodes}
+                    selectedNode={this.state.selectedNode}
+                    onSelectNode={node => {
+                        console.log("NODE", node);
+                        this.setState({ selectedNode: node });
+                    }}
+                />
             </div>
         );
     }

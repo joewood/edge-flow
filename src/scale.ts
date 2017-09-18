@@ -55,10 +55,6 @@ export class Scale {
 			x: (this.screen.width - this.toScreenScale.x * this.virtualSize.width) / 2,
 			y: (this.screen.height - this.toScreenScale.y * this.virtualSize.height) / 2
 		};
-		// console.log("Scale:",scaleuniform );
-		// this.toScreenScale = { x: this.screenSize.width / this.virtualSize.width, y: this.screenSize.height / this.virtualSize.height };
-		// if (this.toScreenScale.x > (2 * this.toScreenScale.y)) this.toScreenScale.x = this.toScreenScale.y * 2;
-		// if (this.toScreenScale.y > (2 * this.toScreenScale.x)) this.toScreenScale.y = this.toScreenScale.x * 2;
 	}
 
 	public panTo(screen: IPoint) {

@@ -19,8 +19,6 @@ export interface IPositionlessNode {
     iconStyle?: IStyle;
     label?: string;
     labelStyle?: IStyle;
-    annotation?: boolean;
-    group?: boolean;
     style?: {
         width?: number;
         height?: number;

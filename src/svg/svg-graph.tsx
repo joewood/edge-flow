@@ -93,7 +93,6 @@ export default function SvgGraph(props: IProps) {
                 height={20}
                 width={20}
                 onClick={(c) => {
-                    console.log("Click")
                     onClickNode && onClickNode({ nodeId: node.key, graph: { x: node.center.x, y: node.center.y }, screen: null });
                     c.stopPropagation();
                 }}

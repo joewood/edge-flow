@@ -8,7 +8,7 @@ import { TransitionMotion, spring, TransitionStyle, TransitionPlainStyle } from 
 import Color = require("color");
 import { ParticleCanvas, ParticleEdge } from "partican";
 
-import { Edge, IEdgeProps, Node, INodeProps  } from "./edge-flow-children";
+import { Edge, IEdgeProps, Node, INodeProps } from "./edge-flow-children";
 import { NodeClickEventArgs, IPathStyle, IParticleStyle, IStyle } from "./model";
 import { getChildrenProps } from "./common";
 import {
@@ -19,7 +19,7 @@ import {
     createEdgeStyle,
     createNodeStyle,
     isNodeStyles,
-    isEdgeStyles,
+    isEdgeStyles
 } from "./animation-style";
 import { Scale } from "./scale";
 import SvgGraph from "./svg/svg-graph";
@@ -92,7 +92,6 @@ export class EdgeFlow extends React.Component<IProps, IState> {
 
     public render() {
         const nodes = getChildrenProps<INodeProps>(this.props.children) || [];
-        // console.log("Rendering Edge Flow: " + nodes.length);
         const errorNodes = nodes.filter(
             n => n.center.x === undefined || isNaN(n.center.x) || n.center.y === undefined || isNaN(n.center.y)
         );
@@ -227,6 +226,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                             >
                                 <SvgGraph
                                     key="SvgGraph"
+                                    onClickNode={onClickNode}
                                     edges={isEdgeStyles(styles).map(edge => ({
                                         key: edge.data.from.id + "-" + edge.data.linkTo,
                                         p0: { x: edge.style.pv0x, y: edge.style.pv0y },
@@ -242,7 +242,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                                         iconStyle: { ...defaults.iconStyle, ...iconStyle, ...node.data.iconStyle },
                                         label: node.data.label,
                                         icon: node.data.icon,
-                                        filter: selectedNodeId === node.key ? "url(#glow)" : undefined
+                                        filter: selectedNodeId === node.key ? "url(#symglow)" : undefined
                                     }))}
                                 />
                                 />) ]}
@@ -257,7 +257,7 @@ export class EdgeFlow extends React.Component<IProps, IState> {
                 >
                     {(styles: MotionStyle[]) => (
                         <ParticleCanvas
-                            key="particles"
+                            key={"particles"+styles.length}
                             style={{ width: diagramWidth, height: diagramHeight, backgroundColor: backgroundColor }}
                             particleStyle={particleStyle}
                             run={animate}
