@@ -136,7 +136,7 @@ export default class Partition extends React.PureComponent<IProps, IState> {
 						<EdgeDag key="21E" linkTo="target" {...edgeStyle} />
 					</NodeDag>
 					{this.state.nodes.map((n, i) =>
-						<NodeDag key={n && "node" + i} id={"node" + i} {...topicNode} label={"topic " + (i + 8)}>
+						<NodeDag key={n && "node" + i} id={"node" + i} {...topicNode} label={"topic top top top topt top top top top "/* + (i + 8)*/}>
 							<EdgeDag linkTo={i % 2 ? "target" : "connector23"} {...edgeStyle} />
 						</NodeDag>
 					)}

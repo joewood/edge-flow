@@ -1,12 +1,16 @@
-import * as React from "react"
-import * as ReactDOM from 'react-dom'
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 // import { range } from "lodash";
 import Swirl from "./swirl";
-import Partition from "./partition"
-import Network from "./network"
-import "font-awesome/css/font-awesome.css"
+import Network from "./network";
+import "font-awesome/css/font-awesome.css";
 
-enum Screen { SWIRL, SIMPLE, PARTITION, NETWORK };
+enum Screen {
+    SWIRL,
+    SIMPLE,
+    PARTITION,
+    NETWORK
+}
 
 interface IState {
     screen: Screen;
@@ -29,18 +33,24 @@ class App extends React.Component<any, IState> {
             width: 300,
             animate: false,
             animationIndex: 0
-        }
-    }
- 
-    private onResize = () => {
-        console.log("resize");
-        this.setState({ width: document.getElementById("root").clientWidth, height: document.getElementById("root").clientHeight });
+        };
     }
 
+    private onResize = () => {
+        console.log("resize");
+        this.setState({
+            width: document.getElementById("root").clientWidth,
+            height: document.getElementById("root").clientHeight
+        });
+    };
+
     public componentDidMount() {
-        this.timer = window.setInterval(this.moveNext, 2000)
+        this.timer = window.setInterval(this.moveNext, 2000);
         window.addEventListener("resize", this.onResize);
-        this.setState({ width: document.getElementById("root").clientWidth, height: document.getElementById("root").clientHeight - 20 });
+        this.setState({
+            width: document.getElementById("root").clientWidth,
+            height: document.getElementById("root").clientHeight - 20
+        });
     }
 
     public componentWillUnmount() {
@@ -52,29 +62,40 @@ class App extends React.Component<any, IState> {
         if (!this.state.animate) return;
         const animationIndex = this.state.animationIndex + 1;
         this.setState({ animationIndex: animationIndex });
-    }
+    };
 
     public render() {
-        const {screen, width, height, animate, animationIndex} = this.state;
+        const { screen, width, height, animate, animationIndex } = this.state;
         const buttonStyle = { height: 50, width: 130, margin: 5, color: "black" };
-        return (<div key="root" id="root"
-            style={{ backgroundColor: "black", overflow: "hidden" }}
-            ref={div => this.div = div}>
-            <div style={{ height: 60 }}>
-                <button key="pause" style={buttonStyle}
-                    onClick={() => this.setState({ animate: !this.state.animate })}>Pause</button>
-                <button key="swirl" style={buttonStyle}
-                    onClick={() => this.setState({ screen: Screen.SWIRL })}>Swirl</button>
-                <button key="network" style={buttonStyle}
-                    onClick={() => this.setState({ screen: Screen.NETWORK })}>Network</button>
+        return (
+            <div
+                key="root"
+                id="root"
+                style={{ backgroundColor: "black", overflow: "hidden" }}
+                ref={div => (this.div = div)}
+            >
+                <div style={{ height: 60 }}>
+                    <button
+                        key="pause"
+                        style={buttonStyle}
+                        onClick={() => this.setState({ animate: !this.state.animate })}
+                    >
+                        Pause
+                    </button>
+                    <button key="swirl" style={buttonStyle} onClick={() => this.setState({ screen: Screen.SWIRL })}>
+                        Swirl
+                    </button>
+                    <button key="network" style={buttonStyle} onClick={() => this.setState({ screen: Screen.NETWORK })}>
+                        Network
+                    </button>
+                </div>
+                {screen == Screen.SWIRL ? (
+                    <Swirl animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
+                ) : (
+                    <Network animate={animate} height={height - 60} width={width} />
+                )}
             </div>
-            {screen == Screen.SWIRL ?
-                <Swirl animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
-                : (screen == Screen.PARTITION) ? <Partition animate={animate} animationIndex={animationIndex} height={height - 60} width={width} />
-                    : <Network animate={animate}  height={height - 60} width={width} />
-            }
-        </div>
-        )
+        );
     }
 }
 

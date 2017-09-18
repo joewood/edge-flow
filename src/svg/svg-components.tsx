@@ -50,15 +50,6 @@ export const WrappedSvgText = (props: {
     const textColor = props.textColor || "black";
     return (
         <g>
-            <defs>
-                <clipPath key={"rect"} id={"clip" + text}>
-                    <rect
-                        y={y}
-                        x={x - (center ? (width / 2) : 0)}
-                        width={width}
-                        height={height} />
-                </clipPath>
-            </defs>
             {
                 texts.map((str, i) => React.createElement("text", {
                     key: "text" + i,
@@ -77,7 +68,7 @@ export const WrappedSvgText = (props: {
                         cursor: "default",
                     },
                     filter: filter,
-                    clipPath: "url(#clip" + text + ")",
+                    clipPath: `rect( ${x-(center ?(width/2):0)}px, ${y}px, ${x+width}px, ${y+height}px)` 
                 }, str))
             }
         </g>);
