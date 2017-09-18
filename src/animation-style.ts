@@ -2,17 +2,12 @@ import { Dictionary } from "lodash";
 import { IPoint } from "./model";
 import { INodeProps } from "./edge-flow-node";
 import { IEdgeProps } from "./edge-flow-edge";
-import { OpaqueConfig, spring } from "react-motion";
-import { Scale } from "./scale"
+import { OpaqueConfig, spring, TransitionStyle, TransitionPlainStyle } from "react-motion";
+import { Scale } from "./scale";
 
-
-export interface EdgeStyleBase {
-    key: string;
-    data: EdgeAndNodeType & { isNode: boolean, isEdge: boolean };
-}
-
-export interface EdgeStyle {
-
+export interface EdgeStyleBase extends TransitionStyle {
+    // key: string;
+    data: any | EdgeAndNodeType & { isNode: boolean; isEdge: boolean };
 }
 
 export interface EdgeStyle extends EdgeStyleBase {
@@ -35,7 +30,7 @@ export interface EdgeStyle extends EdgeStyleBase {
         pv3y?: number;
         scaleX?: number;
         scaleY?: number;
-    }
+    };
 }
 
 export interface EdgeDefaultStyle extends EdgeStyleBase {
@@ -56,15 +51,15 @@ export interface EdgeDefaultStyle extends EdgeStyleBase {
         pv2y?: OpaqueConfig;
         pv3x?: OpaqueConfig;
         pv3y?: OpaqueConfig;
-    }
+    };
 }
 
 export interface NodeStyleBase {
-    key: string;
-    data: INodeProps & { isNode: boolean; isEdge: boolean };
+    // key: string;
+    // data: INodeProps & { isNode: boolean; isEdge: boolean };
 }
 
-export interface NodeStyle extends NodeStyleBase {
+export interface NodeStyle extends NodeStyleBase, TransitionPlainStyle {
     style: {
         x?: number;
         y?: number;
@@ -72,16 +67,16 @@ export interface NodeStyle extends NodeStyleBase {
         yv?: number;
         scaleX?: number;
         scaleY?: number;
-    }
+    };
 }
 
-export interface NodeDefaultStyle extends NodeStyleBase {
+export interface NodeDefaultStyle extends TransitionStyle, NodeStyleBase {
     style: {
         x?: OpaqueConfig;
         y?: OpaqueConfig;
         xv?: OpaqueConfig;
         yv?: OpaqueConfig;
-    }
+    };
 }
 
 export type EdgeAndNodeType = IEdgeProps & { from: INodeProps };
@@ -98,23 +93,30 @@ export function isEdgeStyle(style: MotionStyle): style is EdgeStyle {
 }
 
 export function isEdgeStyles(styles: MotionStyle[]): EdgeStyle[] {
-    return styles.reduce((p, s) => isEdgeStyle(s) ? [...p, s] : p, [] as EdgeStyle[]);
+    return styles.reduce((p, s) => (isEdgeStyle(s) ? [...p, s] : p), [] as EdgeStyle[]);
 }
 
 export function isNodeStyles(styles: MotionStyle[]): NodeStyle[] {
-    return styles.reduce((p, s) => isNodeStyle(s) ? [...p, s] : p, [] as NodeStyle[]);
+    return styles.reduce((p, s) => (isNodeStyle(s) ? [...p, s] : p), [] as NodeStyle[]);
 }
 
-function getDefaultPositions(edge: EdgeAndNodeType, nodeDict: Dictionary<INodeProps>): { p0: IPoint, p1: IPoint, p2: IPoint, p3: IPoint } {
+function getDefaultPositions(
+    edge: EdgeAndNodeType,
+    nodeDict: Dictionary<INodeProps>
+): { p0: IPoint; p1: IPoint; p2: IPoint; p3: IPoint } {
     return {
         p0: edge.p0 || edge.from.center,
         p1: edge.p1 || edge.p0 || edge.from.center,
         p2: edge.p2 || edge.p3 || nodeDict[edge.linkTo].center,
-        p3: edge.p3 || nodeDict[edge.linkTo].center,
-    }
+        p3: edge.p3 || nodeDict[edge.linkTo].center
+    };
 }
 
-export function createEdgeStyle(edge: EdgeAndNodeType, nodeDict: Dictionary<INodeProps>, scale: Scale): EdgeStyle | EdgeDefaultStyle {
+export function createEdgeStyle(
+    edge: EdgeAndNodeType,
+    nodeDict: Dictionary<INodeProps>,
+    scale: Scale
+): EdgeStyle | EdgeDefaultStyle {
     // default values for lines- use source and target node
     const { p0, p1, p2, p3 } = getDefaultPositions(edge, nodeDict);
     return {
@@ -135,14 +137,17 @@ export function createEdgeStyle(edge: EdgeAndNodeType, nodeDict: Dictionary<INod
             pv2x: spring(p2.x),
             pv2y: spring(p2.y),
             pv3x: spring(p3.x),
-            pv3y: spring(p3.y),
+            pv3y: spring(p3.y)
         },
-        data: { isNode: false, isEdge: true, ...edge },
+        data: { isNode: false, isEdge: true, ...edge }
     };
 }
 
-
-export function createDefaultEdgeStyle(edge: EdgeAndNodeType, nodeDict: Dictionary<INodeProps>, scale: Scale/* min: IPoint, max: IPoint, size: IPoint*/): EdgeStyle | EdgeDefaultStyle {
+export function createDefaultEdgeStyle(
+    edge: EdgeAndNodeType,
+    nodeDict: Dictionary<INodeProps>,
+    scale: Scale /* min: IPoint, max: IPoint, size: IPoint*/
+): EdgeStyle | EdgeDefaultStyle {
     // default values for lines- use source and target node
     const { p0, p1, p2, p3 } = getDefaultPositions(edge, nodeDict);
     return {
@@ -163,13 +168,17 @@ export function createDefaultEdgeStyle(edge: EdgeAndNodeType, nodeDict: Dictiona
             pv2x: p2.x,
             pv2y: p2.y,
             pv3x: p3.x,
-            pv3y: p3.y,
+            pv3y: p3.y
         },
-        data: { isNode: false, isEdge: true, ...edge },
+        data: { isNode: false, isEdge: true, ...edge }
     };
 }
 
-export function createNodeStyle(node: INodeProps, point: IPoint, scale: Scale/*min: IPoint, max: IPoint, size: IPoint*/): NodeStyle | NodeDefaultStyle {
+export function createNodeStyle(
+    node: INodeProps,
+    point: IPoint,
+    scale: Scale /*min: IPoint, max: IPoint, size: IPoint*/
+): NodeStyle | NodeDefaultStyle {
     return {
         key: node.id,
         style: {
@@ -178,7 +187,7 @@ export function createNodeStyle(node: INodeProps, point: IPoint, scale: Scale/*m
             xv: spring(point.x),
             yv: spring(point.y)
         },
-        data: { isNode: true, isEdge: false, ...node },
+        data: { isNode: true, isEdge: false, ...node }
     };
 }
 
@@ -191,6 +200,6 @@ export function createDefaultNodeStyle(node: INodeProps, point: IPoint, scale: S
             xv: point.x,
             yv: point.y
         },
-        data: { isNode: true, isEdge: false, ...node },
+        data: { isNode: true, isEdge: false, ...node }
     };
 }
