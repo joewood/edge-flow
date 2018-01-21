@@ -1,15 +1,7 @@
 {
-  "name": "edge-flow",
-  "version": "0.1.12",
+  "name": "test-edge-flow",
+  "version": "0.1.8",
   "description": "React Component using Particle System to animate data-flow",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "directories": {
-    "example": "example"
-  },
-  "scripts": {
-    "test": "npm test"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/joewood/edge-flow.git"
@@ -27,29 +19,31 @@
   },
   "homepage": "https://github.com/joewood/edge-flow#readme",
   "devDependencies": {
-    "@types/color": "^2.0.0",
+    "@types/color": "^2.0",
     "@types/lodash": "^4.14",
     "@types/react": "^16.0",
     "@types/react-dom": "^16.0",
-    "@types/react-motion": "^0.0.23",
-    "autodts": "0.0.6",
-    "typescript": "^2.2.1"
-  },
-  "peerDependencies": {
-    "react": "^16.2",
-    "react-dom": "^16.2"
+    "@types/react-motion": "^0.0",
+    "@types/webpack": "^3.8",
+    "css-loader": "^0.28",
+    "file-loader": "^1.1.6",
+    "font-awesome": "^4.7",
+    "style-loader": "^0.19.1",
+    "ts-loader": "^3.3.0",
+    "typescript": "^2.2",
+    "webpack": "^3.6",
+    "webpack-dev-server": "^2.4"
   },
   "dependencies": {
     "ciena-dagre": "^1.0",
     "ciena-graphlib": "^1.0",
     "color": "^2.0",
     "equals": "^1.1.0",
-    "font-awesome": "^4.7",
     "igloo-ts": "^1.0",
     "lodash": "^4.17",
     "partican": "^0.1",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
+    "react": "^16.2",
+    "react-dom": "^16.2",
     "react-motion": "^0.5"
   }
 }

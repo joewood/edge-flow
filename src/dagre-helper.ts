@@ -1,6 +1,6 @@
 import * as React from "react";
-const layout = require("ciena-dagre");
-const Graph = require("ciena-graphlib").Graph;
+import * as layout from "ciena-dagre";
+import {Graph }from "ciena-graphlib";
 import { keyBy } from "lodash";
 import { IPoint } from "./model";
 import { IEdgeDagProps, INodeDagProps } from "./edge-flow-dag-children";
