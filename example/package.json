@@ -40,7 +40,7 @@
     "color": "^3.1.0",
     "equals": "^1.0.5",
     "igloo-ts": "^1.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "partican": "^0.1",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
